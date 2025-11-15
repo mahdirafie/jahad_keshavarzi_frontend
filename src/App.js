@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+// import AdminLoginPage from "./pages/adminLogin";
 
-function App() {
+import { Routes, Route } from "react-router-dom";
+import DashBoardPage from "./pages/dashboard";
+import TractorDetailPage from "./pages/TractorDetail";
+import { useNavigate } from "react-router-dom";
+import SignUpPage from "./pages/signup";
+import OTPPage from "./pages/OTPCard";
+import PasswordPage from "./pages/password";
+import LoginPage from "./pages/login";
+import HomePage from "./pages/home";
+import TractorsPage from "./pages/tractors";
+
+export default function App() {
+  const navigate = useNavigate();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/" element={<SignUpPage />} />
+      <Route
+        path="/dashboard"
+        element={
+          <DashBoardPage
+            onLogout={() => {
+              navigate("/", { replace: true });
+            }}
+          />
+        }
+      />
+      <Route path="/otp" element={<OTPPage />} />
+      <Route path="/password" element={<PasswordPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/tractors" element={<TractorsPage />} />
+      <Route path="/tractor/:tractorId" element={<TractorDetailPage />} />
+    </Routes>
   );
 }
-
-export default App;

@@ -1,0 +1,21 @@
+/* src/pages/adminLogin.css */
+.login-wrapper {
+    background: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+    min-height: 100vh;
+}
+
+.login-card {
+    max-width: 420px;
+    border-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: none;
+}
+
+.btn-success {
+    background-color: #3e8e41;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #2e6e31;
+}
