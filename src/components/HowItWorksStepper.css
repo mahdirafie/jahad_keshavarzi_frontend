@@ -1,0 +1,200 @@
+.howitworks-section {
+    padding: 60px 20px;
+    direction: rtl;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Force hardware acceleration for smoother animations */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+.howitworks-title {
+    text-align: center;
+    margin-bottom: 60px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-special);
+    width: 100%;
+}
+
+/* Main stepper container */
+.stepper-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Step item */
+.step-item {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    width: 100%;
+    /* Optimize for animations */
+    transform: translateZ(0);
+}
+
+/* Step number icon */
+.step-icon {
+    width: 50px;
+    height: 50px;
+    background-color: var(--color-special);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(60, 89, 144, 0.3);
+    z-index: 2;
+    flex-shrink: 0;
+    margin-left: 25px;
+    border: 3px solid white;
+    transition: all 0.3s ease;
+    /* Optimize for animations */
+    transform: translateZ(0);
+}
+
+.step-item:hover .step-icon {
+    background-color: var(--color-special);
+    transform: scale(1.05);
+}
+
+/* Step content area */
+.step-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-height: 50px;
+}
+
+.step-text {
+    text-align: right;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--color-on-card);
+    line-height: 1.6;
+    background: var(--color-card-background);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    border-right: 4px solid #3c5990;
+    transition: all 0.3s ease;
+}
+
+.step-item:hover .step-text {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateX(-5px);
+}
+
+/* Vertical connector between steps */
+.step-connector {
+    width: 3px;
+    height: 40px;
+    background: linear-gradient(180deg, #3c5990, #cfd6e5);
+    position: absolute;
+    right: 35px;
+    top: 50px;
+    z-index: 1;
+    border-radius: 2px;
+    transform-origin: top;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .howitworks-section {
+        padding: 40px 15px;
+    }
+
+    .howitworks-title {
+        font-size: 1.7rem;
+        margin-bottom: 40px;
+    }
+
+    .stepper-container {
+        gap: 35px;
+        padding: 0 10px;
+    }
+
+    .step-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+        margin-left: 20px;
+    }
+
+    .step-text {
+        font-size: 1rem;
+        padding: 15px;
+    }
+
+    .step-connector {
+        right: 30px;
+        top: 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .howitworks-section {
+        padding: 30px 10px;
+    }
+
+    .howitworks-title {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+    }
+
+    .stepper-container {
+        gap: 30px;
+    }
+
+    .step-item {
+        align-items: center;
+    }
+
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        margin-left: 15px;
+    }
+
+    .step-text {
+        font-size: 0.95rem;
+        padding: 12px;
+        line-height: 1.5;
+    }
+
+    .step-connector {
+        right: 27px;
+        top: 40px;
+        height: 30px;
+    }
+
+    .step-content {
+        min-height: 40px;
+    }
+}
+
+/* Reduced motion support for users who prefer less animation */
+@media (prefers-reduced-motion: reduce) {
+    .howitworks-section,
+    .step-item,
+    .step-icon {
+        transform: none !important;
+    }
+    
+    .step-item:hover .step-icon,
+    .step-item:hover .step-text {
+        transform: none !important;
+    }
+}

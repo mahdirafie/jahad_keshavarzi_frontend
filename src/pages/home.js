@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import BannerPic from "../assets/images/banner.jpg";
+import TractorLandingPic from "../assets/images/tractor_landing.jpeg";
+import VidaBrainAnim from "../components/VidaBrain";
+import "./home.css";
+import { motion } from "framer-motion";
 
 import {
   LineChart,
@@ -13,13 +17,32 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import Footer from "../components/Footer";
+import HowItWorksStepper from "../components/HowItWorksStepper";
+
+const features = [
+  "محاسبه دقیق مصرف سوخت: ثبت و محاسبه دقیق میزان مصرف سوخت در هر بازه زمانی",
+  "موقعیت‌یابی دقیق تراکتور: ردیابی لحظه‌ای موقعیت و مسیر حرکت تراکتور",
+  "ارسال داده هر یک ساعت: به‌روزرسانی خودکار اطلاعات ۲۴ بار در شبانه‌روز",
+  "گزارش‌های جامع: نمایش گزارش‌های دقیق روزانه، هفتگی و ماهیانه",
+  "نمایش دور موتور: پایش RPM و عملکرد موتور در زمان واقعی",
+  "کاهش هزینه و افزایش بهره‌وری: مدیریت بهینه منابع و کاهش هزینه‌های عملیاتی",
+];
+
+const listItemVariants = {
+  hidden: { opacity: 0, x: 50 },
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.3, duration: 0.6, ease: "easeOut" },
+  }),
+};
 
 const AnimatedFuelChart = ({ isVisible }) => {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
     if (isVisible) {
-      // Generate more realistic data with some trend
       const baseValues = [45, 52, 48, 60, 55, 42, 50];
       const data = [
         {
@@ -57,102 +80,45 @@ const AnimatedFuelChart = ({ isVisible }) => {
     }
   }, [isVisible]);
 
-  const styles = {
-    chartCard: {
-      background: "white",
-      borderRadius: "15px",
-      padding: "20px",
-      height: "100%",
-    },
-    chartTitle: {
-      textAlign: "center",
-      color: "#4CAF50",
-      fontWeight: "bold",
-      marginBottom: "20px",
-      fontSize: "18px",
-    },
-  };
-
   return (
-    <div style={styles.chartCard}>
-      <h5 style={styles.chartTitle}>مصرف سوخت هفتگی</h5>
+    <div className="fuel-chart-card">
+      <h5 className="fuel-chart-title">مصرف سوخت هفتگی</h5>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis
             dataKey="name"
-            stroke="#757575"
-            style={{ fontSize: "0.8rem" }}
+            className="fuel-chart-xaxis"
             angle={0}
             textAnchor="middle"
           />
           <YAxis
-            stroke="#757575"
-            style={{ fontSize: "0.8rem" }}
+            className="fuel-chart-yaxis"
             domain={[30, 70]}
             label={{
               value: "لیتر",
               angle: -90,
               position: "insideLeft",
-              style: { fontSize: "0.8rem", fill: "#757575" },
+              className: "fuel-chart-label",
             }}
           />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "white",
-              border: "1px solid #4CAF50",
-              borderRadius: "8px",
-              padding: "12px",
-              textAlign: "right",
-              direction: "rtl",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
-            formatter={(value) => [
-              <span style={{ color: "#4CAF50", fontWeight: "bold" }}>
-                {value} لیتر
-              </span>,
-              "مصرف سوخت",
-            ]}
-            labelFormatter={(label) => (
-              <span style={{ color: "#2e7d32", fontWeight: "600" }}>
-                روز: {label}
-              </span>
-            )}
-          />
-          <Legend
-            wrapperStyle={{
-              fontSize: "0.85rem",
-              textAlign: "center",
-              paddingTop: "10px",
-            }}
-            formatter={() => (
-              <span style={{ color: "#4CAF50" }}>مصرف سوخت</span>
-            )}
-          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend content={<CustomLegend />} />
           <Line
             type="monotone"
             dataKey="fuelUsage"
-            stroke="#4CAF50"
-            strokeWidth={3}
-            dot={{
-              fill: "#4CAF50",
-              r: 6,
-              stroke: "#fff",
-              strokeWidth: 2,
-            }}
-            activeDot={{
-              r: 8,
-              fill: "#2e7d32",
-              stroke: "#fff",
-              strokeWidth: 2,
-            }}
-            animationDuration={1500}
+            stroke="var(--color-special)"
+            strokeWidth={4}
+            className="fuel-chart-line-gradient"
+            dot={{ className: "fuel-chart-dot" }}
+            activeDot={{ className: "fuel-chart-active-dot" }}
+            animationDuration={2000}
             animationEasing="ease-in-out"
           />
         </LineChart>
       </ResponsiveContainer>
-      <div style={{ textAlign: "center", marginTop: "10px" }}>
-        <small style={{ color: "#666" }}>
+      <div className="fuel-chart-average">
+        <small>
           میانگین مصرف هفتگی:{" "}
           {chartData.length
             ? Math.round(
@@ -166,6 +132,35 @@ const AnimatedFuelChart = ({ isVisible }) => {
     </div>
   );
 };
+
+/* Custom Tooltip Component */
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="fuel-chart-tooltip">
+        <div style={{ textAlign: "right", direction: "rtl" }}>
+          <strong style={{ color: "var(--color-special)" }}>
+            روز: {label}
+          </strong>
+        </div>
+        <div style={{ textAlign: "right", direction: "rtl" }}>
+          <span style={{ color: "var(--color-special)", fontWeight: "bold" }}>
+            {payload[0].value} لیتر
+          </span>{" "}
+          مصرف سوخت
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+/* Custom Legend Component */
+const CustomLegend = () => (
+  <div className="fuel-chart-legend">
+    <span style={{ color: "var(--color-special)" }}>مصرف سوخت</span>
+  </div>
+);
 
 // Custom hook for scroll animations
 const useInViewAnimation = () => {
@@ -364,7 +359,7 @@ const HomePage = () => {
       `}</style>
 
       {/* Header */}
-      <nav className="navbar navbar-expand-lg navbar-custom sticky-top py-3">
+      {/* <nav className="navbar navbar-expand-lg navbar-custom sticky-top py-3">
         <div className="container">
           <a
             className="navbar-brand fw-bold"
@@ -446,7 +441,7 @@ const HomePage = () => {
                   {showDropdown && (
                     <div className="dropdown-menu-custom">
                       <div className="dropdown-item-custom">پروفایل</div>
-                      <div 
+                      <div
                         className="dropdown-item-custom"
                         onClick={handleTractorsClick}
                       >
@@ -466,98 +461,34 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className={`fade-in ${heroVisible ? "visible" : ""}`}
-        style={{
-          minHeight: "95vh",
-          background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 25%, #dee2e6 50%, #ced4da 75%, #adb5bd 100%)",
-          display: "flex",
-          alignItems: "center",
-          position: "relative",
-          overflow: "hidden",
-        }}
+        className={`hero-section fade-in ${heroVisible ? "visible" : ""}`}
       >
-        {/* Optional: Add some subtle decorative elements */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "radial-gradient(circle at 80% 20%, rgba(173, 181, 189, 0.1) 0%, transparent 50%)",
-            zIndex: 1,
-          }}
-        ></div>
+        {/* Optional: Subtle decorative element */}
+        <div className="hero-decor"></div>
 
-        <div className="container position-relative" style={{ zIndex: 2 }}>
-          <div className="row align-items-center">
+        <div className="container position-relative hero-content">
+          <div className="row align-items-center g-5">
             <div className="col-lg-6">
-              <h1
-                className="display-4 fw-bold mb-4"
-                style={{ color: "#2e7d32" }}
-              >
+              <h1 className="display-4 fw-bold hero-title">
                 ویدا سنس؛ نسل جدید پایش هوشمند تراکتور
               </h1>
-              <p
-                className="lead mb-4"
-                style={{
-                  fontSize: "18px",
-                  color: "#495057",
-                  lineHeight: "1.8",
-                }}
-              >
+              <p className="lead hero-subtitle">
                 سیستمی برای اندازه‌گیری مصرف سوخت، مکان‌یابی، دور موتور و ارسال
                 خودکار داده‌ها هر یک ساعت
               </p>
-              <div className="d-flex gap-3">
-                <button
-                  className="btn-custom-green"
-                  style={{
-                    background: "linear-gradient(135deg, #66bb6a, #4CAF50)",
-                    boxShadow: "0 4px 15px rgba(102, 187, 106, 0.3)",
-                  }}
-                >
-                  مشاهده امکانات
-                </button>
-                <button
-                  className="btn-custom-outline"
-                  style={{
-                    background: "transparent",
-                    color: "#495057",
-                    border: "2px solid #495057",
-                  }}
-                >
-                  شروع کنید
-                </button>
-              </div>
+              <button className="btn-custom-outline">سفارش دهید</button>
             </div>
             <div className="col-lg-6 mt-5 mt-lg-0">
-              <div
-                style={{
-                  height: "400px",
-                  overflow: "hidden",
-                  borderRadius: "15px",
-                  background: "white",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "1px solid #dee2e6",
-                  boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
-                }}
-              >
+              <div className="landing-img-container">
                 <img
-                  src={BannerPic}
+                  className="landing-img"
+                  src={TractorLandingPic}
                   alt="ویدا سنس - سیستم پایش تراکتور"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
                 />
               </div>
             </div>
@@ -565,19 +496,21 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* About Section */}
+      {/* About Device Section */}
       <section
-        id="about"
+        id="about-device"
         ref={aboutRef}
-        className={`py-5 fade-in ${aboutVisible ? "visible" : ""}`}
+        className={`about-device-section fade-in ${
+          aboutVisible ? "visible" : ""
+        }`}
       >
         <div className="container">
-          <div className="row align-items-center">
+          <div className="row align-items-center g-5">
             <div className="col-lg-6 mb-4 mb-lg-0">
-              <h2 className="fw-bold mb-4" style={{ color: "#4CAF50" }}>
+              <h2 className="about-device-title fw-bold mb-4">
                 ویدا سنس چیست؟
               </h2>
-              <p style={{ fontSize: "16px", lineHeight: "1.8", color: "#333" }}>
+              <p className="about-device-text">
                 ویدا سنس یک ابزار هوشمند برای مدیریت و پایش تراکتورهای کشاورزی
                 است که با نصب بر روی تراکتور، به صورت خودکار اطلاعات مصرف سوخت،
                 موقعیت جغرافیایی، دور موتور و سایر پارامترهای مهم را ثبت و هر یک
@@ -588,17 +521,7 @@ const HomePage = () => {
               </p>
             </div>
             <div className="col-lg-6">
-              <div
-                style={{
-                  background: "white",
-                  borderRadius: "15px",
-                  padding: "25px",
-                  boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-                  height: "400px",
-                }}
-              >
-                <AnimatedFuelChart isVisible={aboutVisible} />
-              </div>
+              <AnimatedFuelChart isVisible={aboutVisible} />
             </div>
           </div>
         </div>
@@ -607,266 +530,87 @@ const HomePage = () => {
       {/* Problems Section */}
       <section
         ref={problemsRef}
-        className={`py-5 fade-in ${problemsVisible ? "visible" : ""}`}
-        style={{ background: "#f8f9fa" }}
+        className={`problems-section fade-in ${
+          problemsVisible ? "visible" : ""
+        }`}
       >
         <div className="container">
-          <h2 className="text-center fw-bold mb-5" style={{ color: "#4CAF50" }}>
+          <h2 className="problems-title text-center mb-5">
             مشکلاتی که ویداسنس حل می‌کند
           </h2>
+
           <div className="row g-4">
-            <div className="col-md-6 col-lg-3">
-              <div className="feature-card hover-lift text-center">
-                <div className="feature-icon">⛽</div>
-                <h5 className="fw-bold mb-3">هدررفت سوخت</h5>
-                <p style={{ color: "#666" }}>
-                  عدم اطلاع دقیق از میزان مصرف سوخت و هدررفت آن
-                </p>
+            {[
+              {
+                title: "هدررفت سوخت",
+                text: "عدم اطلاع دقیق از میزان مصرف سوخت و هدررفت آن",
+              },
+              {
+                title: "ناشناخته بودن مسیر",
+                text: "عدم اطلاع از مسیر حرکت و موقعیت دقیق تراکتور",
+              },
+              {
+                title: "ثبت نادرست ساعات کار",
+                text: "عدم ثبت صحیح ساعات کارکرد واقعی تراکتور",
+              },
+              {
+                title: "فقدان سوابق مصرف",
+                text: "عدم دسترسی به گزارش‌های تاریخی و تحلیل عملکرد",
+              },
+            ].map((feature, index) => (
+              <div key={index} className="col-md-6 col-lg-3">
+                <div className="feature-card-hover">
+                  <div className="feature-decoration"></div>
+                  <h5 className="feature-title">{feature.title}</h5>
+                  <p className="feature-text">{feature.text}</p>
+                </div>
               </div>
-            </div>
-            <div className="col-md-6 col-lg-3">
-              <div className="feature-card hover-lift text-center">
-                <div className="feature-icon">📍</div>
-                <h5 className="fw-bold mb-3">ناشناخته بودن مسیر</h5>
-                <p style={{ color: "#666" }}>
-                  عدم اطلاع از مسیر حرکت و موقعیت دقیق تراکتور
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-3">
-              <div className="feature-card hover-lift text-center">
-                <div className="feature-icon">⏱️</div>
-                <h5 className="fw-bold mb-3">ثبت نادرست ساعات کار</h5>
-                <p style={{ color: "#666" }}>
-                  عدم ثبت صحیح ساعات کارکرد واقعی تراکتور
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-3">
-              <div className="feature-card hover-lift text-center">
-                <div className="feature-icon">📊</div>
-                <h5 className="fw-bold mb-3">فقدان سوابق مصرف</h5>
-                <p style={{ color: "#666" }}>
-                  عدم دسترسی به گزارش‌های تاریخی و تحلیل عملکرد
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Why VidaSense Section */}
       <section
         ref={featuresRef}
-        className={`py-5 fade-in ${featuresVisible ? "visible" : ""}`}
+        className={`why-vida-section fade-in ${
+          featuresVisible ? "visible" : ""
+        }`}
       >
         <div className="container">
-          <h2 className="text-center fw-bold mb-5" style={{ color: "#4CAF50" }}>
-            چرا ویداسنس؟
-          </h2>
-          <div className="row g-4">
-            <div className="col-md-6 col-lg-4">
-              <div className="feature-card hover-lift">
-                <div className="feature-icon">⚡</div>
-                <h5 className="fw-bold mb-3">محاسبه دقیق مصرف سوخت</h5>
-                <p style={{ color: "#666" }}>
-                  ثبت و محاسبه دقیق میزان مصرف سوخت در هر بازه زمانی
-                </p>
-              </div>
+          <h2 className="why-vida-title text-center">چرا ویداسنس؟</h2>
+
+          <div className="row align-items-center">
+            {/* Right column: List (RTL) */}
+            <div className="col-lg-6 order-lg-1 order-2">
+              <ul className="features-list">
+                {features.map((feature, index) => (
+                  <motion.li
+                    key={index}
+                    custom={index}
+                    initial="hidden"
+                    animate={featuresVisible ? "visible" : "hidden"}
+                    variants={listItemVariants}
+                  >
+                    {feature}
+                  </motion.li>
+                ))}
+              </ul>
             </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="feature-card hover-lift">
-                <div className="feature-icon">🗺️</div>
-                <h5 className="fw-bold mb-3">موقعیت‌یابی دقیق تراکتور</h5>
-                <p style={{ color: "#666" }}>
-                  ردیابی لحظه‌ای موقعیت و مسیر حرکت تراکتور
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="feature-card hover-lift">
-                <div className="feature-icon">🔄</div>
-                <h5 className="fw-bold mb-3">ارسال داده هر یک ساعت</h5>
-                <p style={{ color: "#666" }}>
-                  به‌روزرسانی خودکار اطلاعات ۲۴ بار در شبانه‌روز
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="feature-card hover-lift">
-                <div className="feature-icon">📈</div>
-                <h5 className="fw-bold mb-3">گزارش‌های جامع</h5>
-                <p style={{ color: "#666" }}>
-                  نمایش گزارش‌های دقیق روزانه، هفتگی و ماهیانه
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="feature-card hover-lift">
-                <div className="feature-icon">⚙️</div>
-                <h5 className="fw-bold mb-3">نمایش دور موتور</h5>
-                <p style={{ color: "#666" }}>
-                  پایش RPM و عملکرد موتور در زمان واقعی
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="feature-card hover-lift">
-                <div className="feature-icon">💰</div>
-                <h5 className="fw-bold mb-3">کاهش هزینه و افزایش بهره‌وری</h5>
-                <p style={{ color: "#666" }}>
-                  مدیریت بهینه منابع و کاهش هزینه‌های عملیاتی
-                </p>
-              </div>
+
+            {/* Left column: Animation */}
+            <div className="col-lg-6 order-lg-2 order-1 mb-4 mb-lg-0">
+              <VidaBrainAnim />
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section
-        ref={howItWorksRef}
-        className={`py-5 fade-in ${howItWorksVisible ? "visible" : ""}`}
-        style={{ background: "#f8f9fa" }}
-      >
-        <div className="container">
-          <h2 className="text-center fw-bold mb-5" style={{ color: "#4CAF50" }}>
-            نحوه کار
-          </h2>
-          <div className="row g-4">
-            <div className="col-lg-4">
-              <div className="timeline-step hover-lift text-center">
-                <div className="timeline-number">۱</div>
-                <div
-                  className="placeholder-image mb-3"
-                  style={{ height: "150px" }}
-                >
-                  <div>
-                    <svg width="60" height="60" fill="#999" viewBox="0 0 16 16">
-                      <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
-                    </svg>
-                  </div>
-                </div>
-                <h5 className="fw-bold mb-3">نصب دستگاه روی تراکتور</h5>
-                <p style={{ color: "#666" }}>
-                  نصب آسان و سریع دستگاه ویداسنس بر روی تراکتور شما
-                </p>
-              </div>
-            </div>
-            <div className="col-lg-4">
-              <div className="timeline-step hover-lift text-center">
-                <div className="timeline-number">۲</div>
-                <div
-                  className="placeholder-image mb-3"
-                  style={{ height: "150px" }}
-                >
-                  <div>
-                    <svg width="60" height="60" fill="#999" viewBox="0 0 16 16">
-                      <path d="M5 0a.5.5 0 0 1 .5.5V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2A2.5 2.5 0 0 1 14 4.5h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14a2.5 2.5 0 0 1-2.5 2.5v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14A2.5 2.5 0 0 1 2 11.5H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2A2.5 2.5 0 0 1 4.5 2V.5A.5.5 0 0 1 5 0zm-.5 3A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13h7a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 11.5 3h-7zM5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3zM6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z" />
-                    </svg>
-                  </div>
-                </div>
-                <h5 className="fw-bold mb-3">جمع‌آوری هوشمند داده‌ها</h5>
-                <p style={{ color: "#666" }}>
-                  ثبت خودکار و هوشمند تمامی اطلاعات مهم تراکتور
-                </p>
-              </div>
-            </div>
-            <div className="col-lg-4">
-              <div className="timeline-step hover-lift text-center">
-                <div className="timeline-number">۳</div>
-                <div
-                  className="placeholder-image mb-3"
-                  style={{ height: "150px" }}
-                >
-                  <div>
-                    <svg width="60" height="60" fill="#999" viewBox="0 0 16 16">
-                      <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.708 2.825L15 11.105V5.383zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741zM1 11.105l4.708-2.897L1 5.383v5.722z" />
-                    </svg>
-                  </div>
-                </div>
-                <h5 className="fw-bold mb-3">ارسال خودکار به سرور</h5>
-                <p style={{ color: "#666" }}>
-                  ارسال ۲۴ گزارش در روز به سرور و دسترسی آنلاین به داده‌ها
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HowItWorksStepper refProp={howItWorksRef} visible={howItWorksVisible}/>
 
       {/* Footer */}
-      <footer className="py-5" style={{ background: "#000", color: "white" }}>
-        <div className="container">
-          <div className="row">
-            <div className="col-md-4 mb-4 mb-md-0">
-              <h5 className="fw-bold mb-3" style={{ color: "#4CAF50" }}>
-                ویدا سنس
-              </h5>
-              <p style={{ color: "#ccc" }}>
-                سیستم هوشمند پایش و مدیریت تراکتورهای کشاورزی
-              </p>
-            </div>
-            <div className="col-md-4 mb-4 mb-md-0">
-              <h5 className="fw-bold mb-3" style={{ color: "#4CAF50" }}>
-                لینک‌های مفید
-              </h5>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <a
-                    href="#a"
-                    style={{ color: "#ccc", textDecoration: "none" }}
-                  >
-                    صفحه اصلی
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a
-                    href="#about"
-                    style={{ color: "#ccc", textDecoration: "none" }}
-                  >
-                    درباره ما
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a
-                    href="#a"
-                    style={{ color: "#ccc", textDecoration: "none" }}
-                  >
-                    امکانات
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a
-                    href="#contact"
-                    style={{ color: "#ccc", textDecoration: "none" }}
-                  >
-                    تماس با ما
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="col-md-4">
-              <h5 className="fw-bold mb-3" style={{ color: "#4CAF50" }}>
-                تماس با ما
-              </h5>
-              <p style={{ color: "#ccc" }}>
-                📧 info@vidasense.com
-                <br />
-                📞 ۰۲۱-۱۲۳۴۵۶۷۸
-                <br />
-                📍 تهران، ایران
-              </p>
-            </div>
-          </div>
-          <hr style={{ borderColor: "#444", margin: "30px 0" }} />
-          <div className="text-center">
-            <p className="mb-0" style={{ color: "#999" }}>
-              © ۱۴۰۳ شرکت ویدا. تمامی حقوق محفوظ است.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

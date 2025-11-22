@@ -1,3 +1,21 @@
+:root {
+    --color-primary: #071b36;
+    --color-secondary: #0707098f;
+    --color-background: #060709;
+    --color-on-background: white;
+    --color-success: #28a745;
+    --color-danger: #dc3545;
+    --color-warning: #ffc107;
+    --color-info: #17a2b8;
+    --color-card-background: #191919f2;
+    --color-on-card: white;
+    --color-special: #3c5990;
+
+    --accent: #4CAF50;
+    --shadow-color: rgba(60,89,144,0.25);
+    --bg: #f8f9fa;
+}
+
 @font-face {
     font-family: 'IranYekan';
     src: url('./assets/fonts/IRANYekanWeb.ttf') format('truetype');

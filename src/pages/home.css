@@ -1,0 +1,296 @@
+.landing-img-container {
+    overflow: hidden;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.327);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.landing-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Fade-in animation */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hero Section */
+.hero-section {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative element */
+.hero-decor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top center, var(--color-primary), var(--color-secondary));
+    z-index: 1;
+}
+
+/* Content container */
+.hero-content {
+    z-index: 2;
+}
+
+/* Hero text */
+.hero-title {
+    color: white;
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    color: #abd3fb;
+    line-height: 1.8;
+}
+
+/* Buttons */
+
+.btn-custom-outline {
+    background: transparent;
+    color: white !important;
+    border: 2px solid white !important;
+}
+
+.btn-custom-outline:hover {
+    background-color: white !important;
+    color: black !important;
+}
+
+
+
+/* About Device Section */
+.about-device-section {
+    padding: 5rem 0;
+    /* py-5 */
+    background-color: white;
+    /* optional light background */
+}
+
+/* Section Title */
+.about-device-title {
+    color: var(--color-special);
+    font-weight: bold;
+    font-size: 30px;
+}
+
+/* Section Text */
+.about-device-text {
+    font-size: 16px;
+    line-height: 1.8;
+    text-align: justify;
+    color: black;
+}
+
+/* Card container */
+.fuel-chart-card {
+    background: var(--color-card-background);
+    border-radius: 15px;
+    padding: 20px;
+    height: 100%;
+
+    box-shadow:
+        0 8px 30px rgba(60, 89, 144),
+        0 16px 60px rgba(60, 89, 144, 0.2),
+        0 24px 90px rgba(60, 89, 144, 0.15),
+        0 32px 120px rgba(60, 89, 144, 0.1);
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.fuel-chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 10px 40px rgba(60, 89, 144, 0.3),
+        0 20px 70px rgba(60, 89, 144, 0.25),
+        0 30px 100px rgba(60, 89, 144, 0.2),
+        0 40px 140px rgba(60, 89, 144, 0.15);
+}
+
+
+/* Chart title */
+.fuel-chart-title {
+    text-align: center;
+    color: var(--color-on-card);
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+/* X and Y axes */
+.fuel-chart-xaxis text,
+.fuel-chart-yaxis text {
+    font-size: 0.8rem;
+    fill: var(--color-on-card);
+}
+
+/* Y axis label */
+.fuel-chart-label {
+    font-size: 0.8rem;
+    fill: var(--color-on-card);
+}
+
+/* Dots */
+.fuel-chart-dot {
+    fill: var(--color-primary);
+    r: 6;
+    stroke: #fff;
+    stroke-width: 1;
+}
+
+.fuel-chart-active-dot {
+    r: 8;
+    fill: var(--color-special);
+    stroke: #fff;
+    stroke-width: 2;
+}
+
+/* Tooltip */
+.fuel-chart-tooltip {
+    background-color: white;
+    border: 3px solid var(--color-special);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Legend */
+.fuel-chart-legend {
+    font-size: 0.85rem;
+    text-align: center;
+    padding-top: 10px;
+}
+
+/* Average text */
+.fuel-chart-average {
+    text-align: center;
+    margin-top: 10px;
+    color: #666;
+}
+
+/* Section background */
+.problems-section {
+    padding: 5rem 0;
+    background-color: white;
+}
+
+/* Section title */
+.problems-title {
+    color: var(--color-special);
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+/* Feature card */
+.feature-card-hover {
+    position: relative;
+    background: var(--color-card-background);
+    border-radius: 20px;
+    padding: 2.5rem 1.5rem;
+    height: 100%;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 0 8px 30px rgba(60, 89, 144, 0.1),
+        0 16px 60px rgba(60, 89, 144, 0.08),
+        0 24px 90px rgba(60, 89, 144, 0.06);
+}
+
+/* Hover effect: elevation + shadow */
+.feature-card-hover:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 12px 40px rgba(60, 89, 144, 0.3),
+        0 24px 70px rgba(60, 89, 144, 0.25),
+        0 36px 100px rgba(60, 89, 144, 0.2),
+        0 48px 140px rgba(60, 89, 144, 0.15);
+}
+
+/* Decorative element (abstract circle / tech shape) */
+.feature-decoration {
+    position: absolute;
+    top: -40px;
+    left: -40px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, white 0%, #0059ff 100%);
+    opacity: 0.15;
+    transform: rotate(45deg);
+}
+
+/* Card title */
+.feature-title {
+    font-weight: 700;
+    color: var(--color-special);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Card text */
+.feature-text {
+    font-size: 0.95rem;
+    color: var(--color-on-background);
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
+}
+
+
+/* Whole section */
+.why-vida-section {
+    direction: rtl;
+    text-align: right;
+    padding: 1rem 0;
+    background-color: var(--color-background);
+}
+
+/* Title */
+.why-vida-title {
+    font-weight: 700;
+    font-size: 3rem;
+    color: var(--color-special);
+}
+
+/* Feature List */
+.features-list {
+    direction: rtl;
+    list-style-type: disc;
+    list-style-position: inside;
+    padding: 0;
+    margin: 0;
+}
+
+/* Feature item */
+.features-list li {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.8;
+    padding: 0;
+    text-align: right;
+    color: var(--color-on-background);
+}
+
+.features-list li:hover {
+    transform: translateX(-4px);
+    transition: 0.25s ease;
+}

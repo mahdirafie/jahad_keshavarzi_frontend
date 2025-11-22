@@ -1,0 +1,40 @@
+.footer {
+    bottom: 0;
+    width: 100%;
+    padding: 30px;
+    background-color: var(--color-background);
+    overflow: hidden;
+}
+
+.footer img {
+    width: 100px;
+}
+
+.footer-vida-desc p, .footer-vida-desc h3{
+    color: white;
+    text-align: justify;
+}
+
+.footer-general-desc {
+    color: rgb(158, 158, 158);
+    margin: 0px 20px;
+}
+
+.footer-general-desc h4 {
+    font-weight: bold;
+    color: white;
+}
+
+.gen-desc-col {
+    padding: 10px;
+}
+
+.download-app-button {
+    background-color: white;
+    padding: 5px 30px;
+    border-radius: 3px;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    width: 75%;
+}

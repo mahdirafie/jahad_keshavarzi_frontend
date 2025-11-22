@@ -17,7 +17,7 @@ export default function App() {
   const navigate = useNavigate();
   return (
     <Routes>
-      <Route path="/" element={<SignUpPage />} />
+      <Route path="/" element={<HomePage />} />
       <Route
         path="/dashboard"
         element={
