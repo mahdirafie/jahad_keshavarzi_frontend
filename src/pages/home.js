@@ -6,6 +6,8 @@ import VidaBrainAnim from "../components/VidaBrain";
 import "./home.css";
 import { motion } from "framer-motion";
 
+import Header from "../components/Header";
+
 import {
   LineChart,
   Line,
@@ -16,7 +18,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import HowItWorksStepper from "../components/HowItWorksStepper";
 
@@ -174,7 +175,7 @@ const useInViewAnimation = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.3 }
     );
 
     if (ref.current) {
@@ -192,11 +193,6 @@ const useInViewAnimation = () => {
 };
 
 const HomePage = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const navigate = useNavigate();
-
   // Animation refs for sections
   const [heroRef, heroVisible] = useInViewAnimation();
   const [aboutRef, aboutVisible] = useInViewAnimation();
@@ -204,264 +200,10 @@ const HomePage = () => {
   const [featuresRef, featuresVisible] = useInViewAnimation();
   const [howItWorksRef, howItWorksVisible] = useInViewAnimation();
 
-  // Check login status on component mount
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  // Handle logout with confirmation
-  const handleLogout = () => {
-    if (window.confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟")) {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("userData");
-      setIsLoggedIn(false);
-      setShowDropdown(false);
-    }
-  };
-
-  // Handle tractors navigation
-  const handleTractorsClick = () => {
-    navigate("/tractors");
-    setShowDropdown(false);
-  };
-
   return (
-    <div dir="rtl" style={{ fontFamily: "Tahoma, Arial, sans-serif" }}>
-      <style>{`
-        .fade-in {
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        .fade-in.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .hover-lift {
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .hover-lift:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3) !important;
-        }
-        .btn-custom-green {
-          background-color: #4CAF50;
-          color: white;
-          border: none;
-          padding: 12px 30px;
-          border-radius: 8px;
-          font-weight: bold;
-          transition: all 0.3s ease;
-        }
-        .btn-custom-green:hover {
-          background-color: #45a049;
-          transform: scale(1.05);
-          box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-        }
-        .btn-custom-outline {
-          background-color: transparent;
-          color: #000;
-          border: 2px solid #000;
-          padding: 12px 30px;
-          border-radius: 8px;
-          font-weight: bold;
-          transition: all 0.3s ease;
-        }
-        .btn-custom-outline:hover {
-          background-color: #000;
-          color: white;
-        }
-        .hero-section {
-          min-height: 90vh;
-          background: linear-gradient(135deg, #f5f5f5 0%, #e8f5e9 100%);
-        }
-        .feature-card {
-          background: white;
-          border-radius: 15px;
-          padding: 30px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-          height: 100%;
-        }
-        .feature-icon {
-          width: 70px;
-          height: 70px;
-          background: #4CAF50;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 20px;
-          font-size: 30px;
-          color: white;
-        }
-        .timeline-step {
-          position: relative;
-          padding: 30px;
-          background: white;
-          border-radius: 15px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .timeline-number {
-          width: 50px;
-          height: 50px;
-          background: #4CAF50;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 24px;
-          font-weight: bold;
-          margin: 0 auto 20px;
-        }
-        .navbar-custom {
-          background: white;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .dropdown-custom {
-          position: relative;
-        }
-        .dropdown-menu-custom {
-          position: absolute;
-          left: 0;
-          top: 100%;
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-          margin-top: 10px;
-          min-width: 150px;
-          z-index: 1000;
-        }
-        .dropdown-item-custom {
-          padding: 12px 20px;
-          cursor: pointer;
-          transition: background 0.2s ease;
-        }
-        .dropdown-item-custom:hover {
-          background: #f5f5f5;
-        }
-        .placeholder-image {
-          background: #e0e0e0;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #666;
-          font-size: 14px;
-          text-align: center;
-          padding: 20px;
-        }
-      `}</style>
-
+    <div style={{ fontFamily: "Tahoma, Arial, sans-serif" }}>
       {/* Header */}
-      {/* <nav className="navbar navbar-expand-lg navbar-custom sticky-top py-3">
-        <div className="container">
-          <a
-            className="navbar-brand fw-bold"
-            href="#a"
-            style={{ color: "#4CAF50", fontSize: "24px" }}
-          >
-            VidaSense | ویدا سنس
-          </a>
-
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav me-auto">
-              <li className="nav-item">
-                <a
-                  className="nav-link active fw-bold"
-                  href="#a"
-                  style={{ color: "#4CAF50" }}
-                >
-                  صفحه اصلی
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#about">
-                  درباره ما
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#contact">
-                  تماس با ما
-                </a>
-              </li>
-            </ul>
-
-            <div className="d-flex gap-2 align-items-center">
-              {!isLoggedIn ? (
-                <>
-                  <button
-                    onClick={() => {
-                      navigate("/login");
-                    }}
-                    className="btn btn-outline-dark px-4"
-                  >
-                    ورود
-                  </button>
-                  <button
-                    className="btn btn-success px-4"
-                    onClick={() => {
-                      navigate("/signup");
-                    }}
-                    style={{ background: "#4CAF50", border: "none" }}
-                  >
-                    ثبت‌نام
-                  </button>
-                </>
-              ) : (
-                <div className="dropdown-custom">
-                  <button
-                    className="btn btn-light rounded-circle p-2"
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    style={{ width: "45px", height: "45px" }}
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
-                    </svg>
-                  </button>
-                  {showDropdown && (
-                    <div className="dropdown-menu-custom">
-                      <div className="dropdown-item-custom">پروفایل</div>
-                      <div
-                        className="dropdown-item-custom"
-                        onClick={handleTractorsClick}
-                      >
-                        تراکتورها
-                      </div>
-                      <div
-                        className="dropdown-item-custom"
-                        style={{ color: "#dc3545" }}
-                        onClick={handleLogout}
-                      >
-                        خروج
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav> */}
+      <Header behavior={true}/>
 
       {/* Hero Section */}
       <section

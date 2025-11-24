@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import AboutUs from "./pages/AboutUs";
 // import AdminLoginPage from "./pages/adminLogin";
 
 import { Routes, Route } from "react-router-dom";
@@ -12,6 +13,9 @@ import PasswordPage from "./pages/password";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/home";
 import TractorsPage from "./pages/tractors";
+import ContactUs from "./pages/ContactUs";
+import Guide from "./pages/Guide";
+import CompleteProfile from "./pages/completeProfile";
 
 export default function App() {
   const navigate = useNavigate();
@@ -33,6 +37,10 @@ export default function App() {
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/home" element={<HomePage />} />
+      <Route path="/aboutus" element={< AboutUs/>} />
+      <Route path="/contactus" element={< ContactUs/>} />
+      <Route path="/guide" element={< Guide/>} />
+      <Route path="/complete-profile" element={< CompleteProfile/>} />
       <Route path="/tractors" element={<TractorsPage />} />
       <Route path="/tractor/:tractorId" element={<TractorDetailPage />} />
     </Routes>

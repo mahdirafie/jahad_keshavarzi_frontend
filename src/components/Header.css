@@ -1,0 +1,356 @@
+.header-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  z-index: 100;
+}
+
+.header-container {
+  width: 100%;
+  border: solid black 1px;
+  border-radius: 5px;
+  display: flex;
+  box-sizing: border-box;
+  box-shadow: 5px 5px black;
+  z-index: 4;
+  background-color: white;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header-container1 {
+  width: 100%;
+  border: solid black 1px;
+  border-radius: 5px;
+  display: flex;
+  box-sizing: border-box;
+  box-shadow: 5px 5px black;
+  z-index: 3;
+
+  /* Glassmorphism Effect */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: white;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header-container1 img {
+  filter: grayscale(100%) brightness(0) invert(1);
+  transition: filter 0.3s ease; /* Smooth transition for image filter */
+}
+
+.nav-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.nav-item.chosen {
+  font-weight: bold;
+  color: var(--color-on-background);
+  background-color: var(--color-background);
+}
+
+.nav-item:hover {
+  background-color: var(--color-background);
+  color: white;
+}
+
+.nav-items {
+  flex: 1;
+  display: flex;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.login-btn,
+.signup-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn {
+  background-color: var(--color-special);
+  border: 1px solid var(--color-on-background);
+  color: var(--color-on-background);
+}
+
+.login-btn:hover {
+  background-color: var(--color-on-background);
+  color: var(--color-background);
+  border: 1px solid var(--color-background);
+}
+
+.signup-btn {
+  background-color: var(--color-background);
+  border: 1px solid #000;
+  color: var(--color-on-background);
+}
+
+.signup-btn:hover {
+  background-color: var(--color-on-background);
+  color: var(--color-background);
+  border: 1px solid var(--color-background);
+}
+
+.auth-buttons {
+  direction: rtl;
+}
+
+.auth-section {
+  position: relative; /* Needed for dropdown positioning */
+  display: flex;
+  align-items: center;
+}
+
+/* Styles for the logged-in state */
+.profile-menu-container {
+  position: relative;
+}
+
+.profile-icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px; /* Adjust padding as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%; /* Make it circular if desired */
+  transition: background-color 0.2s ease;
+}
+
+.profile-icon-button:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* Slight hover effect */
+}
+
+.profile-icon-svg {
+  margin: 10px;
+  color: #333; /* Or your desired icon color */
+  /* Inherit color in different header states if needed */
+  .header-container & {
+    color: #333;
+  }
+  .header-container1 & {
+    color: #fff; /* Example: different color for transparent header */
+  }
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%; /* Position below the icon */
+  left: 0; /* Align with the left edge of the icon button */
+  background-color: #fff;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 8px 0;
+  min-width: 150px; /* Adjust width as needed */
+  z-index: 100; /* Ensure it's above other content */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s step-end;
+}
+
+.profile-menu-container .profile-icon-button + .profile-dropdown {
+  /* Show dropdown when isProfileMenuOpen is true (controlled by JS) */
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s step-start;
+}
+
+/* Style to apply when dropdown is open */
+.profile-menu-container .profile-icon-button:focus + .profile-dropdown,
+.profile-menu-container .profile-dropdown:hover, /* Keep open on hover */
+.profile-menu-container .profile-icon-button:focus-within + .profile-dropdown /* Keep open when focus is inside */ {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(5px); /* Adjust final position */
+}
+
+/* If state controls visibility directly via className or inline style, use this: */
+.profile-menu-container .profile-dropdown.open {
+  /* Example if you add an 'open' class */
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(5px);
+}
+
+.dropdown-item,
+.dropdown-user-name {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: right; /* RTL */
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-user-name {
+  font-weight: bold;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 5px;
+  cursor: default; /* Not clickable */
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+/* Styles for the logged-out state */
+.auth-buttons {
+  display: flex;
+  gap: 10px; /* Space between login/signup */
+}
+
+.login-btn,
+.signup-btn {
+  /* Your existing button styles */
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Non-selectable class */
+.non-selectable {
+  user-select: none; /* Standard syntax */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+}
+
+/* Hide desktop header on mobile */
+@media (max-width: 768px) {
+  .desktop-header {
+    display: none;
+  }
+}
+
+/* Hide mobile elements on desktop */
+.mobile-menu-button,
+.mobile-sidebar,
+.mobile-menu-overlay {
+  display: none;
+}
+
+/* Show mobile elements only on mobile */
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: block;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid #000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  .mobile-menu-button svg {
+    font-size: 24px;
+  }
+
+  .mobile-sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    z-index: 1001;
+    overflow-y: auto;
+  }
+
+  .mobile-sidebar.open {
+    transform: translateX(-300px);
+  }
+
+  .mobile-menu-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
+  .mobile-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .close-sidebar-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .mobile-sidebar-content {
+    padding: 20px;
+  }
+
+  .mobile-menu-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+  }
+
+  .mobile-menu-item:hover {
+    background-color: #e9ecef;
+  }
+
+  .mobile-menu-item.logout {
+    color: red;
+  }
+}
+
+.auth-section-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
