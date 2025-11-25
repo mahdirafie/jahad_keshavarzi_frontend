@@ -381,6 +381,7 @@ export default function Header({ behavior }) {
           handleLogout();
         }}
         onCancel={() => setIsLogoutConfirmOpen(false)}
+        title={"تایید خروج"}
         message={"آیا مطمئن هستید که می‌خواهید خارج شوید؟"}
       />
     </>

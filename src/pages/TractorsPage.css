@@ -1,0 +1,479 @@
+/* Tractors Page Specific Styles - No Global Conflicts */
+.tractors-page-container {
+    direction: rtl;
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Header */
+.tractors-page-header {
+    margin-top: 70px;
+    background: linear-gradient(135deg, var(--color-special) 0%, #2f3e6b 100%);
+    color: white;
+    padding: 3rem 0 2rem;
+    text-align: center;
+}
+
+.tractors-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tractors-page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tractors-welcome-text {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Main Container */
+.tractors-page-content {
+    padding: 2rem 0 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Actions */
+.tractors-actions-section {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
+}
+
+.btn-add-tractor {
+    background: var(--color-special);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(60, 89, 144, 0.3);
+}
+
+.btn-add-tractor:hover {
+    background: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(60, 89, 144, 0.4);
+}
+
+/* Loading State */
+.tractors-loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.tractors-loading-spinner {
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid var(--color-special);
+    width: 50px;
+    height: 50px;
+    animation: tractorSpin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes tractorSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.tractors-loading-state p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Error State */
+.tractors-error-state {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    border-right: 4px solid #dc3545;
+    margin: 2rem 0;
+}
+
+.tractors-error-state p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Empty State */
+.tractors-empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.tractors-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.tractors-empty-state h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.tractors-empty-state p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Tractors Grid */
+.tractors-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* Tractor Card */
+.tractor-item-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: tractorFadeInUp 0.6s ease forwards;
+}
+
+.tractor-item-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tractor-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.tractor-delete-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.tractor-delete-btn:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.tractor-item-model {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-special);
+    margin-bottom: 1rem;
+    padding-right: 2rem;
+}
+
+.tractor-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tractor-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.tractor-detail-item:last-child {
+    border-bottom: none;
+}
+
+.tractor-detail-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.tractor-detail-value {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Order Section */
+.tractors-order-section {
+    text-align: center;
+    padding: 2rem 0;
+    border-top: 2px solid #e9ecef;
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.tractor-price-container {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.tractor-order-price {
+    color: rgba(0, 128, 0, 0.723);
+    padding: 10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.tractor-total-price {
+    color: green;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.btn-tractor-order {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-tractor-order:hover:not(:disabled) {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.btn-tractor-order:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Tractor Modal Overlay - Specific to tractors page */
+.tractor-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.tractor-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: tractorModalSlideIn 0.3s ease;
+}
+
+@keyframes tractorModalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes tractorFadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tractor-modal-title {
+    color: var(--color-special);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Form Styles */
+.tractor-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.tractor-form-label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.tractor-form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.tractor-form-input:focus {
+    outline: none;
+    border-color: var(--color-special);
+    box-shadow: 0 0 0 3px rgba(60, 89, 144, 0.1);
+}
+
+.tractor-form-input.error {
+    border-color: #dc3545;
+}
+
+.tractor-error-message {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.tractor-modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.tractor-btn-primary {
+    background: var(--color-special);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.tractor-btn-primary:hover:not(:disabled) {
+    background: var(--color-primary);
+    transform: translateY(-2px);
+}
+
+.tractor-btn-primary:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.tractor-btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.tractor-btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tractors-page-title {
+        font-size: 2rem;
+    }
+
+    .tractors-grid-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .tractors-actions-section {
+        justify-content: center;
+    }
+
+    .tractor-modal-content {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .tractor-modal-actions {
+        flex-direction: column;
+    }
+
+    .tractors-order-section {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .tractors-page-header {
+        margin-top: 0;
+        padding: 2rem 0 1.5rem;
+    }
+
+    .tractors-page-title {
+        font-size: 1.7rem;
+    }
+
+    .tractor-item-card {
+        padding: 1rem;
+    }
+
+    .tractor-item-model {
+        font-size: 1.1rem;
+    }
+
+    .btn-tractor-order {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+    }
+}

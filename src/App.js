@@ -12,10 +12,11 @@ import OTPPage from "./pages/OTPCard";
 import PasswordPage from "./pages/password";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/home";
-import TractorsPage from "./pages/tractors";
+import TractorsPage from "./pages/TractorsPage";
 import ContactUs from "./pages/ContactUs";
 import Guide from "./pages/Guide";
 import CompleteProfile from "./pages/completeProfile";
+import VerfityPayment from "./pages/VerfityPayment";
 
 export default function App() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export default function App() {
       <Route path="/guide" element={< Guide/>} />
       <Route path="/complete-profile" element={< CompleteProfile/>} />
       <Route path="/tractors" element={<TractorsPage />} />
+      <Route path="/verify-payment" element={<VerfityPayment />} />
       <Route path="/tractor/:tractorId" element={<TractorDetailPage />} />
     </Routes>
   );

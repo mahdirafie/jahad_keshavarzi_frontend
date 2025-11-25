@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import Footer from "../components/Footer";
 import HowItWorksStepper from "../components/HowItWorksStepper";
+import { useNavigate } from "react-router-dom";
 
 const features = [
   "محاسبه دقیق مصرف سوخت: ثبت و محاسبه دقیق میزان مصرف سوخت در هر بازه زمانی",
@@ -200,6 +201,8 @@ const HomePage = () => {
   const [featuresRef, featuresVisible] = useInViewAnimation();
   const [howItWorksRef, howItWorksVisible] = useInViewAnimation();
 
+  const navigate = useNavigate();
+
   return (
     <div style={{ fontFamily: "Tahoma, Arial, sans-serif" }}>
       {/* Header */}
@@ -223,7 +226,7 @@ const HomePage = () => {
                 سیستمی برای اندازه‌گیری مصرف سوخت، مکان‌یابی، دور موتور و ارسال
                 خودکار داده‌ها هر یک ساعت
               </p>
-              <button className="btn-custom-outline">سفارش دهید</button>
+              <button onClick={() => navigate('/tractors')} className="btn-custom-outline">سفارش دهید</button>
             </div>
             <div className="col-lg-6 mt-5 mt-lg-0">
               <div className="landing-img-container">

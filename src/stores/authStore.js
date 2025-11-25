@@ -32,7 +32,7 @@ const useAuthStore = create((set, get) => ({
       });
 
       set({
-        user: response.data,
+        user: response.data.user,
         isAuthenticated: true,
         isLoading: false,
         error: null
