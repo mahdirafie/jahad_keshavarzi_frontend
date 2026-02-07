@@ -12,7 +12,7 @@ import useCustomSnackbar from "../hooks/useSnackBar";
 const NavigationBar = ({ onCartClick, onProfileClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isLoggedIn = !!localStorage.getItem("token");
+  const isLoggedIn = !!localStorage.getItem("authToken");
   const { showSnackbar } = useCustomSnackbar();
 
   const isActive = (path) => location.pathname === path;
@@ -26,14 +26,14 @@ const NavigationBar = ({ onCartClick, onProfileClick }) => {
         <AiOutlineHome className="nav-icon" />
       </div>
 
-      <div
+      {/* <div
         className={`nav-item ${isActive("/shop") ? "active" : ""}`}
         onClick={() => navigate("/shop")}
       >
         <AiOutlineShop className="nav-icon" />
-      </div>
+      </div> */}
 
-      <div className="nav-item" onClick={() => {
+      {/* <div className="nav-item" onClick={() => {
         if (isLoggedIn) {
           onCartClick();
         } else {
@@ -43,13 +43,13 @@ const NavigationBar = ({ onCartClick, onProfileClick }) => {
       }}>
         <div className="cart-icon-container">
           <AiOutlineShoppingCart className="nav-icon" />
-          {/* {cartItems.length > 0 && (
+          {cartItems.length > 0 && (
             <div className="cart-quantity">
               {cartItems.length}
             </div>
-          )} */}
+          )}
         </div>
-      </div>
+      </div> */}
 
       <div
         className="nav-item"

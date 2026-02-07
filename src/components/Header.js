@@ -358,7 +358,7 @@ export default function Header({ behavior }) {
 
       <NavigationBar
         // onCartClick={handleCartClick}
-        // onProfileClick={handleAccountClick}
+        onProfileClick={handleAccountClick}
       />
 
       {/* Modals */}
