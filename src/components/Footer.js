@@ -66,15 +66,14 @@ export default function Footer() {
                 <Divider color="white" />
                 <Rxw className={"w-100 justify-content-between"}>
                   <p>نمایندگی مرکزی:</p>
-                  <p>تهران - مشریه - خیابان صالحی</p>
-                </Rxw>
-                <Rxw className={"w-100 justify-content-between"}>
-                  <p>کارخانه:</p>
-                  <p>کیلومتر 5 جاده خمین - پارک علم و فناوری</p>
+                  <p style={{ fontSize: 12 }}>
+                    کیلومتر 5 جاده خمین ، پارک علم و فناوری ، ساختمان نواوران ،
+                    طبقه دوم ، اتاق 212
+                  </p>
                 </Rxw>
                 <Rxw className={"w-100 justify-content-between"}>
                   <p>شماره تماس:</p>
-                  <p>09991660196</p>
+                  <p>09129388020</p>
                 </Rxw>
               </Cxl>
             </Col>
@@ -87,7 +86,10 @@ export default function Footer() {
                 </div>
               </Cxl>
             </Col>
-            <Col lg={4} className="gen-desc-col">
+            <Col
+              lg={4}
+              className="gen-desc-col d-flex align-items-center justify-content-center"
+            >
               <div>
                 <a
                   referrerPolicy="origin"

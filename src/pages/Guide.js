@@ -3,19 +3,20 @@ import { motion } from "framer-motion";
 import "./Guide.css";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   {
     title: "ثبت‌نام در سامانه",
-    description: "ابتدا در سامانه ویداسنس ثبت‌نام کنید. این فرآیند تنها چند دقیقه زمان می‌برد و پس از تایید شماره و کد ملی حساب کاربری شما فعال می‌شود."
+    description: "ابتدا در سامانه وی پایش ثبت‌نام کنید. این فرآیند تنها چند دقیقه زمان می‌برد و پس از تایید شماره و کد ملی حساب کاربری شما فعال می‌شود."
   },
   {
     title: "سفارش دستگاه در سامانه",
     description: "پس از ثبت‌نام، وارد پروفایل کاربری شده و به بخش 'تراکتورها' بروید. در این بخش می‌توانید تراکتورهایی که قصد نصب دستگاه روی آنها را دارید، تعریف و اضافه کنید. سپس با کلیک روی دکمه 'ثبت سفارش' به درگاه پرداخت متصل شده و پس از تکمیل پرداخت، سفارش شما نهایی می‌شود."
   },
   {
-    title: "ارسال نصاب برای نصب دستگاه",
-    description: "کارشناسان ما پس از بررسی سفارش، در اسرع وقت با شما تماس گرفته و هماهنگی‌های لازم را انجام می‌دهند. سپس نصاب‌های متخصص به آدرس ثبت‌شده در سامانه اعزام شده و فرآیند نصب دستگاه را انجام می‌دهند."
+    title: "ارجاع به تکنسین نصب",
+    description: "با ثبت هر سفارش کارشناسان ما بعد از بررسی و اخذ نوبت جهت فرایند نصب و اجرا در محل با شما تماس خواهند گرفت ."
   },
   {
     title: "جمع‌آوری هوشمند داده‌ها",
@@ -23,7 +24,7 @@ const steps = [
   },
   {
     title: "ارسال خودکار به سرور",
-    description: "دستگاه هر یک ساعت یکبار داده‌های جمع‌آوری شده را به صورت خودکار به سرور مرکزی ویداسنس ارسال می‌کند تا همیشه به اطلاعات به‌روز دسترسی داشته باشید."
+    description: "دستگاه هر یک ساعت یکبار داده‌های جمع‌آوری شده را به صورت خودکار به سرور مرکزی وی پایش ارسال می‌کند تا همیشه به اطلاعات به‌روز دسترسی داشته باشید."
   },
   {
     title: "تهیه گزارش داده‌ها در بازه‌های مختلف",
@@ -71,6 +72,7 @@ const iconVariants = {
 };
 
 export default function Guide() {
+  const navigate = useNavigate();
   return (
     <div className="guide-page">
         <Header/>
@@ -83,7 +85,7 @@ export default function Guide() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            راهنمای خرید و نصب دستگاه ویداسنس
+            راهنمای خرید و نصب دستگاه وی پایش
           </motion.h1>
           <motion.p 
             className="guide-subtitle"
@@ -157,8 +159,12 @@ export default function Guide() {
             <h3>آماده شروع هستید؟</h3>
             <p>همین حالا ثبت‌نام کنید و اولین قدم برای مدیریت هوشمند تراکتورهای خود را بردارید</p>
             <div className="cta-buttons">
-              <button className="btn btn-primary">ثبت‌نام در سامانه</button>
-              <button className="btn btn-outline">تماس با پشتیبانی</button>
+              <button className="btn btn-primary" onClick={() => {
+                navigate('/signup');
+              }}>ثبت‌نام در سامانه</button>
+              <button className="btn btn-outline" onClick={() => {
+                navigate('/contactus');
+              }}>تماس با پشتیبانی</button>
             </div>
           </motion.div>
         </div>

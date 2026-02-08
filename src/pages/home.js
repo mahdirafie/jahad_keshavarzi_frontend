@@ -220,7 +220,7 @@ const HomePage = () => {
           <div className="row align-items-center g-5">
             <div className="col-lg-6">
               <h1 className="display-4 fw-bold hero-title">
-                ویدا سنس؛ نسل جدید پایش هوشمند تراکتور
+                وی پایش؛ نسل جدید پایش هوشمند تراکتور
               </h1>
               <p className="lead hero-subtitle">
                 سیستمی برای اندازه‌گیری مصرف سوخت، مکان‌یابی، دور موتور و ارسال
@@ -233,7 +233,7 @@ const HomePage = () => {
                 <img
                   className="landing-img"
                   src={TractorLandingPic}
-                  alt="ویدا سنس - سیستم پایش تراکتور"
+                  alt="وی پایش - سیستم پایش تراکتور"
                 />
               </div>
             </div>
@@ -253,10 +253,10 @@ const HomePage = () => {
           <div className="row align-items-center g-5">
             <div className="col-lg-6 mb-4 mb-lg-0">
               <h2 className="about-device-title fw-bold mb-4">
-                ویدا سنس چیست؟
+                وی پایش چیست؟
               </h2>
               <p className="about-device-text">
-                ویدا سنس یک ابزار هوشمند برای مدیریت و پایش تراکتورهای کشاورزی
+                وی پایش یک ابزار هوشمند برای مدیریت و پایش تراکتورهای کشاورزی
                 است که با نصب بر روی تراکتور، به صورت خودکار اطلاعات مصرف سوخت،
                 موقعیت جغرافیایی، دور موتور و سایر پارامترهای مهم را ثبت و هر یک
                 ساعت یکبار به سرور ارسال می‌کند. این سیستم روزانه ۲۴ گزارش دقیق
@@ -281,7 +281,7 @@ const HomePage = () => {
       >
         <div className="container">
           <h2 className="problems-title text-center mb-5">
-            مشکلاتی که ویداسنس حل می‌کند
+            مشکلاتی که وی پایش حل می‌کند
           </h2>
 
           <div className="row g-4">
@@ -323,7 +323,7 @@ const HomePage = () => {
         }`}
       >
         <div className="container">
-          <h2 className="why-vida-title text-center">چرا ویداسنس؟</h2>
+          <h2 className="why-vida-title text-center">چرا وی پایش؟</h2>
 
           <div className="row align-items-center">
             {/* Right column: List (RTL) */}
