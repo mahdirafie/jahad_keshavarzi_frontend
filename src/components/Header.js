@@ -10,6 +10,7 @@ import useCustomSnackbar from "../hooks/useSnackBar";
 import { FiClock } from "react-icons/fi";
 import ConfirmModal from "../modals/ConfirmModal";
 import ProfileModal from "../modals/ProfileModal";
+import OrdersModal from "../modals/OrderModal";
 
 // Profile icon component
 const ProfileIcon = () => (
@@ -59,7 +60,9 @@ export default function Header({ behavior }) {
 
   // States
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("authToken")
+  );
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
@@ -142,10 +145,10 @@ export default function Header({ behavior }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
     setIsLoggedIn(false);
-    showSnackbar('با موفقیت خارج شدید!', 'success')
+    showSnackbar("با موفقیت خارج شدید!", "success");
   };
 
   const handleLogoutClick = () => {
@@ -155,8 +158,8 @@ export default function Header({ behavior }) {
 
   const handleTractorsClick = () => {
     setIsProfileMenuOpen(false);
-    navigate('/tractors');
-  }
+    navigate("/machines");
+  };
 
   const handleAccountClick = async () => {
     try {
@@ -176,7 +179,6 @@ export default function Header({ behavior }) {
   //   navigate(`/product/${category.id}`);
   //   setIsMobileMenuOpen(false);
   // };
-
 
   return (
     <>
@@ -238,7 +240,7 @@ export default function Header({ behavior }) {
                           className="dropdown-item"
                         >
                           <span>تراکتور ها</span>
-                          <FaTractor/>
+                          <FaTractor />
                         </button>
                         <button
                           onClick={() => setIsOrdersModalOpen(true)}
@@ -335,6 +337,15 @@ export default function Header({ behavior }) {
               </div>
 
               <div
+                className="mobile-menu-item"
+                onClick={() => {
+                  navigate('/guide');
+                }}
+              >
+                <span>راهنمای سامانه</span>
+              </div>
+
+              <div
                 className="mobile-menu-item logout"
                 onClick={() => {
                   setIsLogoutConfirmOpen(true);
@@ -370,10 +381,10 @@ export default function Header({ behavior }) {
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
-      {/* <RecentOrders
+      <OrdersModal
         isOpen={isOrdersModalOpen}
         onClose={() => setIsOrdersModalOpen(false)}
-      /> */}
+      />
       <ConfirmModal
         isOpen={isLogoutConfirmOpen}
         onConfirm={() => {

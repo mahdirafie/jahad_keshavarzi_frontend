@@ -228,7 +228,7 @@ const HomePage = () => {
               </p>
               <button onClick={() => {
                 if(localStorage.getItem("authToken")) {
-                  navigate("/tractors")
+                  navigate("/machines")
                 } else {
                   navigate("/signup")
                 }

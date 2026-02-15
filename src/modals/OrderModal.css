@@ -1,0 +1,168 @@
+.orders-modal .modal-container {
+    max-width: 1100px;
+    width: 95%;
+}
+
+.orders-modal-content {
+    padding: 0 0 1rem 0;
+}
+
+/* Loading & error states */
+.orders-loading,
+.orders-error,
+.orders-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #666;
+}
+
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid var(--color-special, #3c5990);
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.retry-btn {
+    background: var(--color-special, #3c5990);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    margin-top: 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.retry-btn:hover {
+    background: var(--color-primary, #2f3e6b);
+}
+
+/* Table styles - responsive */
+.orders-table-wrapper {
+    max-height: 60vh;
+    overflow: auto;
+    /* both x and y scrolling */
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 900px;
+    /* ensures horizontal scroll on small screens */
+}
+
+.orders-table th {
+    background: #f8f9fa;
+    padding: 12px 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.orders-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+    color: #495057;
+}
+
+.orders-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.type-detail {
+    font-size: 0.8rem;
+    color: #6c757d;
+    display: block;
+}
+
+/* Payment method & status badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.ref-id {
+    font-family: monospace;
+    direction: ltr;
+    unicode-bidi: embed;
+}
+
+/* Footer */
+.modal-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.close-modal-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.close-modal-btn:hover {
+    background: #5a6268;
+}
+
+/* Mobile-friendly: stack table as cards (optional, but keeps the scroll approach) */
+@media (max-width: 600px) {
+    .orders-table th {
+        font-size: 0.8rem;
+        padding: 8px 5px;
+    }
+
+    .orders-table td {
+        font-size: 0.8rem;
+        padding: 8px 5px;
+    }
+
+    .status-badge {
+        padding: 2px 6px;
+        font-size: 0.7rem;
+    }
+}

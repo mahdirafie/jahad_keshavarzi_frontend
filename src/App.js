@@ -12,7 +12,7 @@ import OTPPage from "./pages/OTPCard";
 import PasswordPage from "./pages/password";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/home";
-import TractorsPage from "./pages/TractorsPage";
+import MachineryPage from "./pages/MachineryPage";
 import ContactUs from "./pages/ContactUs";
 import Guide from "./pages/Guide";
 import CompleteProfile from "./pages/completeProfile";
@@ -42,7 +42,7 @@ export default function App() {
       <Route path="/contactus" element={< ContactUs/>} />
       <Route path="/guide" element={< Guide/>} />
       <Route path="/complete-profile" element={< CompleteProfile/>} />
-      <Route path="/tractors" element={<TractorsPage />} />
+      <Route path="/machines" element={<MachineryPage />} />
       <Route path="/verify-payment" element={<VerfityPayment />} />
       <Route path="/tractor/:tractorId" element={<TractorDetailPage />} />
     </Routes>

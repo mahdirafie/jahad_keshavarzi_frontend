@@ -9,6 +9,9 @@ const CompleteProfile = () => {
   const { completeProfile, getProfile, isLoading, error } = useAuthStore();
   const { showSnackbar } = useCustomSnackbar();
 
+  const backendUrl = 'http://localhost:4000';
+  // const backendUrl = 'https://peymash.ir/api;
+
   const markaziCities = [
     "اراک",
     "آشتیان",
@@ -109,7 +112,7 @@ const CompleteProfile = () => {
         // Set image preview - add cache busting
         if (existingData.profile_image) {
           const baseUrl =
-            process.env.REACT_APP_API_URL || "http://localhost:4000";
+            process.env.REACT_APP_API_URL || backendUrl;
           const imagePath = existingData.profile_image;
 
           console.log("Setting image preview from profile data:");
@@ -170,12 +173,12 @@ const CompleteProfile = () => {
       console.log("=== STARTING FILE UPLOAD ===");
       console.log(
         "API URL:",
-        process.env.REACT_APP_API_URL || "http://localhost:4000"
+        process.env.REACT_APP_API_URL || backendUrl
       );
       console.log(
         "Upload endpoint:",
         `${
-          process.env.REACT_APP_API_URL || "http://localhost:4000"
+          process.env.REACT_APP_API_URL || backendUrl
         }/user/upload-profile-image`
       );
       console.log("File details:", {
@@ -186,7 +189,7 @@ const CompleteProfile = () => {
 
       const response = await fetch(
         `${
-          process.env.REACT_APP_API_URL || "http://localhost:4000"
+          process.env.REACT_APP_API_URL || backendUrl
         }/user/upload-profile-image`,
         {
           method: "POST",
@@ -226,7 +229,7 @@ const CompleteProfile = () => {
 
         // Update preview with cache busting - FIXED VERSION
         const baseUrl =
-          process.env.REACT_APP_API_URL || "http://localhost:4000";
+          process.env.REACT_APP_API_URL || backendUrl;
         let newImageUrl;
 
         if (imagePath.startsWith("http")) {
@@ -371,7 +374,7 @@ const CompleteProfile = () => {
 
       const response = await fetch(
         `${
-          process.env.REACT_APP_API_URL || "http://localhost:4000"
+          process.env.REACT_APP_API_URL || backendUrl
         }/user/delete-profile-image`,
         {
           method: "DELETE",
@@ -505,7 +508,7 @@ const CompleteProfile = () => {
   const getDisplayedDate = () => {
     if (formData.birth_year && formData.birth_month && formData.birth_day) {
       const monthObj = persianMonths.find(
-        (m) => m.value == formData.birth_month
+        (m) => m.value === formData.birth_month
       );
       const monthName = monthObj ? monthObj.label : formData.birth_month;
       return `${formData.birth_year}/${monthName}/${formData.birth_day}`;
@@ -782,7 +785,7 @@ const CompleteProfile = () => {
                           const currentSrc = e.target.src;
                           const baseUrl =
                             process.env.REACT_APP_API_URL ||
-                            "http://localhost:4000";
+                            backendUrl;
 
                           // Check if we need to add base URL
                           if (
