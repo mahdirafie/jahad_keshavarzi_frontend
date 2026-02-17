@@ -320,10 +320,10 @@ const MachineryPage = () => {
       localStorage.setItem("lastAuthority", authority);
 
       // Step 3: Redirect to Zarinpal payment page
-      const gatewayBaseUrl =
-        process.env.NODE_ENV === "production"
-          ? "https://zarinpal.com/pg/StartPay/"
-          : "https://sandbox.zarinpal.com/pg/StartPay/";
+      const gatewayBaseUrl = "https://payment.zarinpal.com/pg/StartPay/"
+//        process.env.NODE_ENV === "production"
+//          ? "https://zarinpal.com/pg/StartPay/"
+//          : "https://sandbox.zarinpal.com/pg/StartPay/";
       window.location.href = `${gatewayBaseUrl}${authority}`;
     } catch (error) {
       showSnackbar("خطا در فرآیند سفارش", "error");

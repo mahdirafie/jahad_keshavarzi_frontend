@@ -9,8 +9,8 @@ const CompleteProfile = () => {
   const { completeProfile, getProfile, isLoading, error } = useAuthStore();
   const { showSnackbar } = useCustomSnackbar();
 
-  const backendUrl = 'http://localhost:4000';
-  // const backendUrl = 'https://peymash.ir/api;
+  // const backendUrl = 'http://localhost:4000';
+  const backendUrl = 'https://peymash.ir/api';
 
   const markaziCities = [
     "اراک",

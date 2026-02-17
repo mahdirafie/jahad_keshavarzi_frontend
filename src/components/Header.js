@@ -324,6 +324,15 @@ export default function Header({ behavior }) {
             ارتباط با ما
           </div>
 
+	  <div
+            className="mobile-menu-item"
+            onClick={() => {
+              navigate("/guide");
+            }}
+          >
+            <span>راهنمای سامانه</span>
+          </div>
+
           {isLoggedIn && (
             <>
               <div
@@ -339,10 +348,10 @@ export default function Header({ behavior }) {
               <div
                 className="mobile-menu-item"
                 onClick={() => {
-                  navigate('/guide');
+                  navigate('/machines');
                 }}
               >
-                <span>راهنمای سامانه</span>
+                <span>تراکتور ها</span>
               </div>
 
               <div
@@ -390,6 +399,7 @@ export default function Header({ behavior }) {
         onConfirm={() => {
           setIsLogoutConfirmOpen(false);
           handleLogout();
+	  navigate('/home');
         }}
         onCancel={() => setIsLogoutConfirmOpen(false)}
         title={"تایید خروج"}
