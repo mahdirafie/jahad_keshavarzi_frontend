@@ -17,6 +17,7 @@ import ContactUs from "./pages/ContactUs";
 import Guide from "./pages/Guide";
 import CompleteProfile from "./pages/completeProfile";
 import VerfityPayment from "./pages/VerfityPayment";
+import UserOrders from "./pages/userOrders";
 
 export default function App() {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/machines" element={<MachineryPage />} />
       <Route path="/verify-payment" element={<VerfityPayment />} />
       <Route path="/tractor/:tractorId" element={<TractorDetailPage />} />
+      <Route path="/userorders" element={<UserOrders />} />
     </Routes>
   );
 }

@@ -203,6 +203,8 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
+  console.log(process.env);
+
   return (
     <div style={{ fontFamily: "Tahoma, Arial, sans-serif" }}>
       {/* Header */}

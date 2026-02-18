@@ -1,0 +1,78 @@
+/* Modern monochrome design */
+.user-card {
+    background: #ffffff;
+    border-radius: 16px;
+    transition: box-shadow 0.2s ease;
+}
+
+.user-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+}
+
+/* Search box */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    right: 12px;
+    font-size: 0.9rem;
+}
+
+.search-box input {
+    padding-right: 35px;
+    width: 220px;
+    border-radius: 30px;
+    border: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #ced4da;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+/* Badge */
+.badge.bg-dark {
+    background: #212529 !important;
+    font-weight: 400;
+    padding: 0.35rem 0.65rem;
+}
+
+.badge.bg-secondary {
+    background: #6c757d !important;
+}
+
+/* Order item */
+.order-item {
+    border-radius: 12px;
+    background: #f8f9fa;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Machine item */
+.machine-item:last-child {
+    border-bottom: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-box input {
+        width: 180px;
+    }
+
+    .user-card .card-body {
+        padding: 1.25rem;
+    }
+}

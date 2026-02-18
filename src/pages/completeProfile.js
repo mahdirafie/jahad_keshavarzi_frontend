@@ -3,14 +3,15 @@ import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import useCustomSnackbar from "../hooks/useSnackBar";
 import "./completeProfile.css";
+import BASE_URL from "../common/baseUrl";
 
 const CompleteProfile = () => {
   const navigate = useNavigate();
   const { completeProfile, getProfile, isLoading, error } = useAuthStore();
   const { showSnackbar } = useCustomSnackbar();
 
-  // const backendUrl = 'http://localhost:4000';
-  const backendUrl = 'https://peymash.ir/api';
+  const backendUrl = 'http://localhost:4000';
+  // const backendUrl = 'https://peymash.ir/api';
 
   const markaziCities = [
     "اراک",
@@ -112,7 +113,7 @@ const CompleteProfile = () => {
         // Set image preview - add cache busting
         if (existingData.profile_image) {
           const baseUrl =
-            process.env.REACT_APP_API_URL || backendUrl;
+            BASE_URL || backendUrl;
           const imagePath = existingData.profile_image;
 
           console.log("Setting image preview from profile data:");
@@ -173,12 +174,12 @@ const CompleteProfile = () => {
       console.log("=== STARTING FILE UPLOAD ===");
       console.log(
         "API URL:",
-        process.env.REACT_APP_API_URL || backendUrl
+        BASE_URL || backendUrl
       );
       console.log(
         "Upload endpoint:",
         `${
-          process.env.REACT_APP_API_URL || backendUrl
+          BASE_URL || backendUrl
         }/user/upload-profile-image`
       );
       console.log("File details:", {
@@ -189,7 +190,7 @@ const CompleteProfile = () => {
 
       const response = await fetch(
         `${
-          process.env.REACT_APP_API_URL || backendUrl
+          BASE_URL || backendUrl
         }/user/upload-profile-image`,
         {
           method: "POST",
@@ -229,7 +230,7 @@ const CompleteProfile = () => {
 
         // Update preview with cache busting - FIXED VERSION
         const baseUrl =
-          process.env.REACT_APP_API_URL || backendUrl;
+          BASE_URL || backendUrl;
         let newImageUrl;
 
         if (imagePath.startsWith("http")) {
@@ -374,7 +375,7 @@ const CompleteProfile = () => {
 
       const response = await fetch(
         `${
-          process.env.REACT_APP_API_URL || backendUrl
+          BASE_URL || backendUrl
         }/user/delete-profile-image`,
         {
           method: "DELETE",
@@ -784,7 +785,7 @@ const CompleteProfile = () => {
                           // Try to fix the URL
                           const currentSrc = e.target.src;
                           const baseUrl =
-                            process.env.REACT_APP_API_URL ||
+                            BASE_URL ||
                             backendUrl;
 
                           // Check if we need to add base URL

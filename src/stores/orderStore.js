@@ -4,10 +4,13 @@ import BASE_URL from "../common/baseUrl";
 
 const useOrderStore = create((set, get) => ({
   // ---------- State ----------
-  orders: [], // list of user's orders with product & machinery details
-  currentOrder: null, // the last submitted order (optional)
+  orders: [], // logged-in user's orders
+  currentOrder: null, // last submitted order
+  allUsersOrders: [], // all users with their machines & orders (admin view)
   isLoading: false,
   error: null,
+  isLoadingAll: false, // loading for all-users endpoint
+  errorAll: null,
 
   // ---------- Actions ----------
 
@@ -116,20 +119,46 @@ const useOrderStore = create((set, get) => ({
     }
   },
 
-  // ------------------------------------------------------------
-  // 3. UTILITY: clear error
-  // ------------------------------------------------------------
-  clearError: () => set({ error: null }),
+  // 3. FETCH ALL USERS ORDERS (admin)
+  fetchAllUsersOrders: async () => {
+    set({ isLoadingAll: true, errorAll: null });
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("لطفاً وارد حساب کاربری خود شوید");
 
-  // ------------------------------------------------------------
-  // 4. RESET STORE (e.g., on logout)
-  // ------------------------------------------------------------
+      const response = await axios.get(`${BASE_URL}/order/all-users-orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // The API returns { message, info: [...] }
+      set({
+        allUsersOrders: response.data.info || [],
+        isLoadingAll: false,
+      });
+      return { success: true, data: response.data.info };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "خطا در دریافت اطلاعات همه کاربران";
+      set({ errorAll: errorMessage, isLoadingAll: false });
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  // 4. UTILITY: clear error
+  clearError: () => set({ error: null, errorAll: null }),
+
+  // 5. RESET STORE (e.g., on logout)
   reset: () =>
     set({
       orders: [],
       currentOrder: null,
+      allUsersOrders: [],
       isLoading: false,
       error: null,
+      isLoadingAll: false,
+      errorAll: null,
     }),
 }));
 
