@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import useOrderStore from "../stores/orderStore";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import "./userOrders.css";
 
 const UserOrders = () => {
