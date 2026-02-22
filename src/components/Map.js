@@ -27,7 +27,7 @@ export default function Map({cities}) {
     const handleMouseOver = (event) => {
       if (event.target.classList.contains("city-path")) {
         const elementId = event.target.id;
-        console.log(elementId);
+        // console.log(elementId);
         setPopupVisible({
           isVisible: true,
           message: `دستگاه های فعال: ${activeDevices[elementId]}`,

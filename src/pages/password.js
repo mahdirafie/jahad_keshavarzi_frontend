@@ -126,8 +126,6 @@ export default function PasswordPage() {
         password: formData.password
       };
 
-      console.log("Creating user with data:", requestBody);
-
       // Call the user creation API
       const response = await fetch(`${BASE_URL}/user/create`, {
         method: "POST",
@@ -147,9 +145,7 @@ export default function PasswordPage() {
         setTouched({});
         
         // Navigate to dashboard on successful user creation
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
+        navigate('/login');
         
       } else {
         // Handle different error cases

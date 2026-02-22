@@ -67,9 +67,6 @@ export default function TractorDetailPage() {
       }
 
       const data = await response.json();
-      console.log("API Response:", data);
-      console.log("Logs:", data.logs);
-      console.log("First log:", data.logs?.[0]);
       setTractor(data.tractor);
       setLogs(data.logs || []);
       setError(null);

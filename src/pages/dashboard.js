@@ -178,7 +178,6 @@ export default function DashboardPage({ onLogout }) {
                         {tractors.map((t, i) => (
                           <tr
                             onClick={() => {
-                                console.log("CLICKED");
                               navigate(`/tractor/${t.id}`);
                             }}
                             key={t.id}

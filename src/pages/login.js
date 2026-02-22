@@ -86,7 +86,7 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setTouched({ national_code: true, password: true });
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -95,12 +95,12 @@ export default function LoginPage() {
       // Call login API
       const response = await fetch(`${BASE_URL}/user/login`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           national_code: formData.national_code,
-          password: formData.password
+          password: formData.password,
         }),
       });
 
@@ -108,17 +108,14 @@ export default function LoginPage() {
 
       if (response.ok) {
         showSnackbar("ورود با موفقیت انجام شد!", "success");
-        
+
         // Save token and user data to localStorage
         if (data.token) {
-          localStorage.setItem('authToken', data.token);
+          localStorage.setItem("authToken", data.token);
         }
-        
+
         // Navigate to dashboard
-        setTimeout(() => {
-          navigate("/home");
-        }, 1500);
-        
+        navigate('/home');
       } else {
         throw new Error(data.message || "خطا در ورود به سیستم");
       }
@@ -148,7 +145,8 @@ export default function LoginPage() {
       <div
         className="position-absolute top-0 start-0 w-100 h-100"
         style={{
-          background: "linear-gradient(135deg, rgba(67, 67, 67, 0.8), rgba(0, 0, 0, 0.85))",
+          background:
+            "linear-gradient(135deg, rgba(67, 67, 67, 0.8), rgba(0, 0, 0, 0.85))",
           zIndex: -1,
         }}
       />
@@ -307,19 +305,42 @@ export default function LoginPage() {
                     </div>
                   )}
                 </div>
-
-                {/* Submit */}
-                <div style={{
+                {/* Forgot Password Link */}
+              <div
+                className="d-flex justify-content-start mb-2"
+                style={{
                   opacity: 0,
                   transform: "translateY(20px)",
-                  animation: "fadeInUp 0.6s ease-out 0.5s forwards",
-                }}>
+                  animation: "fadeInUp 0.6s ease-out 0.45s forwards",
+                }}
+              >
+                <span
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-decoration-none fw-semibold"
+                  style={{
+                    color: "#489d4c",
+                    cursor: "pointer",
+                  }}
+                >
+                  رمز عبور را فراموش کرده‌اید؟
+                </span>
+              </div>
+
+                {/* Submit */}
+                <div
+                  style={{
+                    opacity: 0,
+                    transform: "translateY(20px)",
+                    animation: "fadeInUp 0.6s ease-out 0.5s forwards",
+                  }}
+                >
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className="btn btn-lg w-100 text-white fw-semibold position-relative overflow-hidden"
                     style={{
-                      background: "linear-gradient(135deg, #66bb6a 0%, #388e3c 100%)",
+                      background:
+                        "linear-gradient(135deg, #66bb6a 0%, #388e3c 100%)",
                       borderRadius: "12px",
                       border: "none",
                       padding: "14px",
@@ -331,12 +352,14 @@ export default function LoginPage() {
                     onMouseEnter={(e) => {
                       if (!isSubmitting) {
                         e.target.style.transform = "translateY(-2px)";
-                        e.target.style.boxShadow = "0 6px 20px rgba(56, 142, 60, 0.6)";
+                        e.target.style.boxShadow =
+                          "0 6px 20px rgba(56, 142, 60, 0.6)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.transform = "translateY(0)";
-                      e.target.style.boxShadow = "0 4px 15px rgba(102, 187, 106, 0.4)";
+                      e.target.style.boxShadow =
+                        "0 4px 15px rgba(102, 187, 106, 0.4)";
                     }}
                   >
                     {isSubmitting ? (
@@ -367,7 +390,11 @@ export default function LoginPage() {
                 <span
                   onClick={() => navigate("/signup")}
                   className="text-decoration-none fw-semibold"
-                  style={{ color: "#489d4c", cursor: "pointer", display: "inline" }}
+                  style={{
+                    color: "#489d4c",
+                    cursor: "pointer",
+                    display: "inline",
+                  }}
                 >
                   ثبت‌نام کنید
                 </span>

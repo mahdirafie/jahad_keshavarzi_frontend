@@ -116,8 +116,8 @@ const CompleteProfile = () => {
             BASE_URL || backendUrl;
           const imagePath = existingData.profile_image;
 
-          console.log("Setting image preview from profile data:");
-          console.log("Image path from DB:", imagePath);
+          // console.log("Setting image preview from profile data:");
+          // console.log("Image path from DB:", imagePath);
 
           let fullImageUrl;
           if (imagePath.startsWith("http")) {
@@ -128,7 +128,7 @@ const CompleteProfile = () => {
             fullImageUrl = `${baseUrl}/${imagePath}?t=${Date.now()}`;
           }
 
-          console.log("Constructed URL:", fullImageUrl);
+          // console.log("Constructed URL:", fullImageUrl);
           setImagePreview(fullImageUrl);
         } else {
           setImagePreview("");
@@ -171,22 +171,22 @@ const CompleteProfile = () => {
 
       const token = localStorage.getItem("authToken") || "";
 
-      console.log("=== STARTING FILE UPLOAD ===");
-      console.log(
-        "API URL:",
-        BASE_URL || backendUrl
-      );
-      console.log(
-        "Upload endpoint:",
-        `${
-          BASE_URL || backendUrl
-        }/user/upload-profile-image`
-      );
-      console.log("File details:", {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      });
+      // console.log("=== STARTING FILE UPLOAD ===");
+      // console.log(
+      //   "API URL:",
+      //   BASE_URL || backendUrl
+      // );
+      // console.log(
+      //   "Upload endpoint:",
+      //   `${
+      //     BASE_URL || backendUrl
+      //   }/user/upload-profile-image`
+      // );
+      // console.log("File details:", {
+      //   name: file.name,
+      //   size: file.size,
+      //   type: file.type,
+      // });
 
       const response = await fetch(
         `${
@@ -201,11 +201,11 @@ const CompleteProfile = () => {
         }
       );
 
-      console.log("Upload response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries())
-      );
+      // console.log("Upload response status:", response.status);
+      // console.log(
+      //   "Response headers:",
+      //   Object.fromEntries(response.headers.entries())
+      // );
 
       // Check if response is JSON
       const contentType = response.headers.get("content-type");
@@ -219,11 +219,11 @@ const CompleteProfile = () => {
 
       const data = await response.json();
 
-      console.log("Upload response data:", data);
+      // console.log("Upload response data:", data);
 
       if (response.ok && data.success) {
         const imagePath = data.profile_image;
-        console.log("Received image path from backend:", imagePath);
+        // console.log("Received image path from backend:", imagePath);
 
         // Update form data
         setFormData((prev) => ({ ...prev, profile_image: imagePath }));
@@ -244,12 +244,12 @@ const CompleteProfile = () => {
           newImageUrl = `${baseUrl}/${imagePath}?t=${Date.now()}`;
         }
 
-        console.log("Constructed image URL for preview:", newImageUrl);
+        // console.log("Constructed image URL for preview:", newImageUrl);
 
         // Test the image URL before setting it
         const testImage = new Image();
         testImage.onload = () => {
-          console.log("Image test PASSED - setting preview");
+          // console.log("Image test PASSED - setting preview");
           setImagePreview(newImageUrl);
           showSnackbar("تصویر با موفقیت آپلود شد", "success");
         };
@@ -271,11 +271,11 @@ const CompleteProfile = () => {
             }${imagePath}?t=${Date.now()}`;
           }
 
-          console.log("Trying alternative URL:", alternativeUrl);
+          // console.log("Trying alternative URL:", alternativeUrl);
 
           const testImage2 = new Image();
           testImage2.onload = () => {
-            console.log("Alternative URL worked!");
+            // console.log("Alternative URL worked!");
             setImagePreview(alternativeUrl);
             showSnackbar("تصویر با موفقیت آپلود شد", "success");
           };
@@ -386,7 +386,7 @@ const CompleteProfile = () => {
         }
       );
 
-      console.log("Delete response status:", response.status);
+      // console.log("Delete response status:", response.status);
 
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
@@ -398,7 +398,7 @@ const CompleteProfile = () => {
       }
 
       const data = await response.json();
-      console.log("Delete response data:", data);
+      // console.log("Delete response data:", data);
 
       if (response.ok && data.success) {
         // Clear local state
@@ -776,9 +776,9 @@ const CompleteProfile = () => {
 
                           // Check if it's a blob URL (temporary preview)
                           if (e.target.src.startsWith("blob:")) {
-                            console.log(
-                              "Blob URL failed, this is normal for expired URLs"
-                            );
+                            // console.log(
+                            //   "Blob URL failed, this is normal for expired URLs"
+                            // );
                             return;
                           }
 
@@ -798,24 +798,24 @@ const CompleteProfile = () => {
                               const fixedUrl = `${baseUrl}${
                                 currentSrc.split("?")[0]
                               }?t=${Date.now()}`;
-                              console.log("Trying fixed URL:", fixedUrl);
+                              // console.log("Trying fixed URL:", fixedUrl);
                               e.target.src = fixedUrl;
                             } else {
                               // Try with base URL
                               const fixedUrl = `${baseUrl}/${
                                 currentSrc.split("?")[0]
                               }?t=${Date.now()}`;
-                              console.log("Trying fixed URL:", fixedUrl);
+                              // console.log("Trying fixed URL:", fixedUrl);
                               e.target.src = fixedUrl;
                             }
                           } else {
                             // Already has base URL, try with new timestamp
                             const urlWithoutParams = currentSrc.split("?")[0];
                             const fixedUrl = `${urlWithoutParams}?t=${Date.now()}`;
-                            console.log(
-                              "Refreshing with new timestamp:",
-                              fixedUrl
-                            );
+                            // console.log(
+                            //   "Refreshing with new timestamp:",
+                            //   fixedUrl
+                            // );
                             e.target.src = fixedUrl;
                           }
                         }}

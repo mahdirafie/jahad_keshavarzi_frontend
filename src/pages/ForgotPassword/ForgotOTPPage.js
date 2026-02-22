@@ -1,27 +1,28 @@
+// pages/ForgotOTPPage.js
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import backgroundImage from "../assets/images/background.jpg";
-import BASE_URL from "../common/baseUrl";
-import useCustomSnackbar from "../hooks/useSnackBar";
+import backgroundImage from "../../assets/images/background.jpg";
+import BASE_URL from "../../common/baseUrl";
+import useCustomSnackbar from "../../hooks/useSnackBar";
 
-export default function OTPPage() {
+export default function ForgotOTPPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showSnackbar } = useCustomSnackbar();
 
-  // Get phone number and user data from navigation state
-  const { phone, userData } = location.state || {};
+  const { national_code } = location.state || {};
+  if (!national_code) {
+    // If no national code, redirect back
+    navigate("/forgot-password");
+  }
 
-  // State management
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendTimer, setResendTimer] = useState(120);
   const [canResend, setCanResend] = useState(false);
 
-  // Refs for each input field
   const inputRefs = useRef([]);
 
-  // Countdown timer for resend button
   useEffect(() => {
     if (resendTimer > 0) {
       const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
@@ -31,59 +32,42 @@ export default function OTPPage() {
     }
   }, [resendTimer]);
 
-  // Handle input change for each OTP field
   const handleChange = (index, value) => {
-    // Only allow digits
     if (value && !/^\d$/.test(value)) return;
-
-    // Update OTP array
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
-    // Auto-focus to next field if value entered
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
-  // Handle keydown for backspace navigation
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace") {
       if (!otp[index] && index > 0) {
-        // Move to previous field if current is empty
         inputRefs.current[index - 1]?.focus();
       }
     } else if (e.key === "ArrowRight" && index > 0) {
-      // RTL: ArrowRight goes to previous (right side)
       inputRefs.current[index - 1]?.focus();
     } else if (e.key === "ArrowLeft" && index < 5) {
-      // RTL: ArrowLeft goes to next (left side)
       inputRefs.current[index + 1]?.focus();
     }
   };
 
-  // Handle paste event to fill all fields
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim();
-
-    // Only process if pasted data is 6 digits
     if (/^\d{6}$/.test(pastedData)) {
       const newOtp = pastedData.split("");
       setOtp(newOtp);
-      // Focus last input
       inputRefs.current[5]?.focus();
     }
   };
 
-  // Check if all fields are filled
   const isComplete = otp.every((digit) => digit !== "");
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!isComplete) {
       showSnackbar("لطفاً تمام فیلدها را پر کنید", "error");
       return;
@@ -93,59 +77,48 @@ export default function OTPPage() {
     const otpCode = otp.join("");
 
     try {
-      // Call OTP verification API
-      const response = await fetch(`${BASE_URL}/otp/verify_otp`, {
+      const response = await fetch(`${BASE_URL}/otp/verify-forgot-password-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          phone: phone,
-          code: otpCode 
+        body: JSON.stringify({
+          national_code: national_code,
+          code: otpCode,
         }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        showSnackbar("تایید با موفقیت انجام شد!", "success");
-        
-        // Navigate to password page with all user data
-        navigate("/password", { 
-          state: { 
-            ...userData,
-            phone: phone
-          } 
-        });
+        showSnackbar("کد تأیید صحیح است", "success");
+        // Navigate to reset password page with national code
+        navigate("/reset-password", { state: { national_code } });
       } else {
-        throw new Error(data.message || "کد تایید نامعتبر است");
+        throw new Error(data.message || "کد نامعتبر است");
       }
     } catch (error) {
-      showSnackbar(error.message || "خطا در تایید کد", "error");
+      showSnackbar(error.message, "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle resend OTP
   const handleResend = async () => {
     if (!canResend) return;
-
     try {
-      const response = await fetch(`${BASE_URL}/otp/send_otp`, {
+      const response = await fetch(`${BASE_URL}/otp/reset-password-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: phone, national_code: userData.national_code }),
+        body: JSON.stringify({ national_code }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setResendTimer(120);
         setCanResend(false);
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
-        showSnackbar("کد تایید مجدداً ارسال شد", "success");
+        showSnackbar("کد جدید ارسال شد", "success");
       } else {
-        throw new Error(data.message || "خطا در ارسال مجدد کد");
+        throw new Error(data.message || "خطا در ارسال مجدد");
       }
     } catch (error) {
       showSnackbar(error.message, "error");
@@ -154,7 +127,7 @@ export default function OTPPage() {
 
   return (
     <div className="min-vh-100 position-relative overflow-hidden">
-      {/* Background with blur and overlay */}
+      {/* Background & overlay */}
       <div
         className="position-absolute top-0 start-0 w-100 h-100"
         style={{
@@ -166,8 +139,6 @@ export default function OTPPage() {
           zIndex: -2,
         }}
       />
-
-      {/* Dark overlay */}
       <div
         className="position-absolute top-0 start-0 w-100 h-100"
         style={{
@@ -177,7 +148,6 @@ export default function OTPPage() {
         }}
       />
 
-      {/* Main content */}
       <div className="container min-vh-100 d-flex align-items-center justify-content-center py-5">
         <div
           className="col-12 col-md-8 col-lg-5"
@@ -195,7 +165,6 @@ export default function OTPPage() {
             }}
           >
             <div className="card-body p-4 p-md-5">
-              {/* Header */}
               <div className="text-center mb-4">
                 <h1
                   className="fw-bold mb-2"
@@ -205,7 +174,7 @@ export default function OTPPage() {
                     animation: "fadeIn 1s ease-out 0.2s both",
                   }}
                 >
-                  تایید شماره موبایل
+                  تأیید کد
                 </h1>
                 <p
                   className="text-muted"
@@ -213,17 +182,11 @@ export default function OTPPage() {
                     animation: "fadeIn 1s ease-out 0.4s both",
                   }}
                 >
-                  کد تایید ۶ رقمی به شماره{" "}
-                  <span className="fw-semibold" style={{ color: "#2c3e50" }}>
-                    {phone || "09121234567"}
-                  </span>{" "}
-                  ارسال شد
+                  کد ۶ رقمی ارسال‌شده به شماره همراه خود را وارد کنید
                 </p>
               </div>
 
-              {/* Form Content */}
               <form onSubmit={handleSubmit}>
-                {/* OTP Input Fields */}
                 <div
                   className="mb-4"
                   style={{
@@ -231,10 +194,9 @@ export default function OTPPage() {
                   }}
                 >
                   <label className="form-label fw-semibold text-dark text-center d-block mb-3">
-                    کد تایید <span className="text-danger">*</span>
+                    کد تأیید <span className="text-danger">*</span>
                   </label>
 
-                  {/* OTP Input Grid - RTL order */}
                   <div
                     className="d-flex justify-content-center gap-2"
                     dir="ltr"
@@ -268,7 +230,6 @@ export default function OTPPage() {
                   </div>
                 </div>
 
-                {/* Resend Code Button */}
                 <div
                   className="text-center mb-4"
                   style={{
@@ -286,25 +247,24 @@ export default function OTPPage() {
                         transition: "all 0.3s ease",
                       }}
                     >
-                      ارسال مجدد کد تایید
+                      ارسال مجدد کد
                     </button>
                   ) : (
                     <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
-                      ارسال مجدد کد تا{" "}
+                      ارسال مجدد تا{" "}
                       <span className="fw-semibold" style={{ color: "#2c3e50" }}>
                         {resendTimer}
                       </span>{" "}
-                      ثانیه دیگر
+                      ثانیه
                     </p>
                   )}
                 </div>
 
-                {/* Submit Button */}
                 <div style={{ animation: "fadeInUp 0.8s ease-out 0.5s both" }}>
                   <button
                     type="submit"
                     disabled={isSubmitting || !isComplete}
-                    className="btn btn-lg w-100 text-white fw-semibold position-relative overflow-hidden"
+                    className="btn btn-lg w-100 text-white fw-semibold"
                     style={{
                       background: isComplete
                         ? "linear-gradient(135deg, #66bb6a 0%, #388e3c 100%)"
@@ -341,29 +301,25 @@ export default function OTPPage() {
                           role="status"
                           aria-hidden="true"
                         ></span>
-                        در حال تایید...
+                        در حال تأیید...
                       </>
                     ) : (
-                      "تایید کد"
+                      "تأیید کد"
                     )}
                   </button>
                 </div>
               </form>
 
-              {/* Footer text */}
               <p
                 className="text-center text-muted mt-4 mb-0 small"
                 style={{ animation: "fadeIn 1s ease-out 0.6s both" }}
               >
-                شماره اشتباه است؟{" "}
                 <span
-                  onClick={() => {
-                    navigate("/signup");
-                  }}
+                  onClick={() => navigate("/forgot-password")}
                   className="text-decoration-none fw-semibold"
-                  style={{ color: "#489d4c", cursor: "pointer", display: "inline" }}
+                  style={{ color: "#489d4c", cursor: "pointer" }}
                 >
-                  بازگشت
+                  ویرایش کد ملی
                 </span>
               </p>
             </div>

@@ -18,22 +18,16 @@ import Guide from "./pages/Guide";
 import CompleteProfile from "./pages/completeProfile";
 import VerfityPayment from "./pages/VerfityPayment";
 import UserOrders from "./pages/userOrders";
+import ForgotPasswordPage from "./pages/ForgotPassword/ForgotPasswordPage";
+import ForgotOTPPage from "./pages/ForgotPassword/ForgotOTPPage";
+import ResetPasswordPage from "./pages/ForgotPassword/ResetPasswordPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 export default function App() {
   const navigate = useNavigate();
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <DashBoardPage
-            onLogout={() => {
-              navigate("/", { replace: true });
-            }}
-          />
-        }
-      />
       <Route path="/otp" element={<OTPPage />} />
       <Route path="/password" element={<PasswordPage />} />
       <Route path="/signup" element={<SignUpPage />} />
@@ -47,6 +41,10 @@ export default function App() {
       <Route path="/verify-payment" element={<VerfityPayment />} />
       <Route path="/tractor/:tractorId" element={<TractorDetailPage />} />
       <Route path="/userorders" element={<UserOrders />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/forgot-otp" element={<ForgotOTPPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

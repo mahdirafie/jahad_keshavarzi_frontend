@@ -66,7 +66,6 @@ const usePaymentStore = create((set, get) => ({
           },
         }
       );
-      console.log(response);
 
       const verificationData = response.data.data;
       
