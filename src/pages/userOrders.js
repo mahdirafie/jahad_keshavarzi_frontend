@@ -2,183 +2,242 @@ import React, { useEffect, useState } from "react";
 import useOrderStore from "../stores/orderStore";
 import "./userOrders.css";
 
+const TRACTOR_TYPE_FA = {
+  ROMANIAN_UNIVERSAL: "یونیورسال رومانی",
+  FERGUSON: "فرگوسن",
+  JOHN_DEERE: "جان‌دیر",
+  NEW_HOLLAND: "نیوهلند",
+  CASE: "کیس",
+  OTHER: "سایر",
+};
+
+const COMBINE_USAGE_FA = {
+  WHEAT: "گندم",
+  RICE: "برنج",
+  MULTIPURPOSE: "چندمنظوره",
+};
+
+const CHOPPER_TYPE_FA = {
+  SELF_PROPELLED: "خودرو",
+  PULL_TYPE: "کششی",
+};
+
+const getMachineInfo = (machinery) => {
+  if (!machinery) return { category: "نامشخص", subType: "" };
+  if (machinery.tractor)
+    return {
+      category: "تراکتور",
+      subType: TRACTOR_TYPE_FA[machinery.tractor.tractor_type] || "",
+    };
+  if (machinery.combine)
+    return {
+      category: "کمباین",
+      subType: COMBINE_USAGE_FA[machinery.combine.usage_type] || "",
+    };
+  if (machinery.chopper)
+    return {
+      category: "چاپر",
+      subType: CHOPPER_TYPE_FA[machinery.chopper.chopper_type] || "",
+    };
+  return { category: "نامشخص", subType: "" };
+};
+
 const UserOrders = () => {
   const {
     allUsersOrders,
+    ordersCount,
     isLoadingAll,
     errorAll,
     fetchAllUsersOrders,
     clearError,
   } = useOrderStore();
-  const [search, setSearch] = useState("");
+
+  const [searchInput, setSearchInput] = useState("");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
-    fetchAllUsersOrders();
-    return () => clearError();
-  }, [fetchAllUsersOrders, clearError]);
+    const timer = setTimeout(() => {
+      setQuery(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  const filteredUsers = allUsersOrders?.filter(
-    (u) => u.name.includes(search) || u.national_code.includes(search)
-  );
+  useEffect(() => {
+    fetchAllUsersOrders({ query, page, limit });
+  }, [query, page, limit, fetchAllUsersOrders]);
 
-  const getMachineType = (m) => {
-    if (m.tractor)
-      return {
-        name: "تراکتور",
-        id: m.tractor.machinery_id,
-        type: m.tractor.tractor_type,
-      };
-    if (m.combine)
-      return {
-        name: "کمباین",
-        id: m.combine.machinery_id,
-        type: m.combine.usage_type,
-      };
-    if (m.chopper)
-      return { name: "چاپر", id: m.chopper.machinery_id, type: "" };
-    return { name: "نامشخص", id: null, type: "" };
-  };
+  useEffect(() => () => clearError(), [clearError]);
 
-  if (isLoadingAll) {
-    return (
-      <div className="container py-5 text-center">
-        <div className="spinner-border text-secondary" role="status">
-          <span className="visually-hidden">بارگذاری...</span>
-        </div>
-      </div>
-    );
-  }
+  const rows = [];
+  allUsersOrders?.forEach((user) => {
+    user.orders?.forEach((order) => {
+      rows.push({ user, order });
+    });
+  });
 
-  if (errorAll) {
-    return (
-      <div className="container py-5">
-        <div className="alert alert-light border text-secondary" role="alert">
-          {errorAll}
-        </div>
-      </div>
-    );
-  }
+  const totalPages = Math.max(1, Math.ceil(ordersCount.total / limit));
 
   return (
-    <div className="container py-4" dir="rtl">
-      {/* Header */}
-      <div className="d-flex flex-wrap align-items-center justify-content-between mb-4">
-        <h2 className="fw-light m-0">همه سفارش‌ها</h2>
-        <div className="search-box">
-          <i className="bi bi-search text-secondary"></i>
+    <div className="orders-page" dir="rtl">
+      <div className="op-header">
+        <h1>سفارش‌ها</h1>
+        <p>مشاهده و مدیریت سفارش‌های کاربران</p>
+      </div>
+
+      <div className="op-stats">
+        <div className="op-stat-card">
+          <div className="op-stat-left">
+            <span className="op-stat-dot green"></span>
+            <span className="op-stat-label">کل سفارش‌ها</span>
+          </div>
+          <span className="op-stat-value">{ordersCount.total}</span>
+        </div>
+        <div className="op-stat-card">
+          <div className="op-stat-left">
+            <span className="op-stat-dot blue"></span>
+            <span className="op-stat-label">نقدی</span>
+          </div>
+          <span className="op-stat-value">{ordersCount.cash}</span>
+        </div>
+        <div className="op-stat-card">
+          <div className="op-stat-left">
+            <span className="op-stat-dot amber"></span>
+            <span className="op-stat-label">اقساطی</span>
+          </div>
+          <span className="op-stat-value">{ordersCount.installment}</span>
+        </div>
+        <div className="op-stat-card">
+          <div className="op-stat-left">
+            <span className="op-stat-dot purple"></span>
+            <span className="op-stat-label">امروز</span>
+          </div>
+          <span className="op-stat-value">{ordersCount.today}</span>
+        </div>
+      </div>
+
+      <div className="op-toolbar">
+        <div className="op-search">
+          <i className="bi bi-search"></i>
           <input
             type="text"
-            className="form-control form-control-sm"
-            placeholder="جستجوی نام یا کد ملی"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            placeholder="جستجو..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
       </div>
 
-      {/* User Cards */}
-      <div className="row g-4">
-        {filteredUsers?.length === 0 ? (
-          <p className="text-secondary">نتیجه‌ای یافت نشد.</p>
+      <div className="op-table">
+        <div className="op-thead">
+          <span className="op-col op-col-user">کاربر</span>
+          <span className="op-col op-col-machine">ماشین</span>
+          <span className="op-col op-col-payment">پرداخت</span>
+          <span className="op-col op-col-amount">مبلغ</span>
+          <span className="op-col op-col-status">وضعیت</span>
+        </div>
+
+        {isLoadingAll ? (
+          <div className="op-state-msg">
+            <div className="spinner-border spinner-border-sm" role="status" />
+            <span>در حال بارگذاری...</span>
+          </div>
+        ) : errorAll ? (
+          <div className="op-state-msg op-error-msg">{errorAll}</div>
+        ) : rows.length === 0 ? (
+          <div className="op-state-msg">نتیجه‌ای یافت نشد.</div>
         ) : (
-          filteredUsers?.map((user) => (
-            <div key={user.national_code} className="col-12 col-md-6 col-lg-4">
-              <div className="card user-card h-100 border-0 shadow-sm">
-                <div className="card-body">
-                  {/* User header */}
-                  <div className="d-flex align-items-center mb-3">
-                    <div className="avatar bg-light rounded-circle d-flex align-items-center justify-content-center">
-                      <i className="bi bi-person text-secondary fs-5"></i>
-                    </div>
-                    <div className="me-3 overflow-hidden">
-                      <h6 className="mb-0 text-truncate">{user.name}</h6>
-                      <small className="text-secondary">
-                        {user.national_code}
-                      </small>
-                    </div>
+          rows.map((r, idx) => {
+            const info = getMachineInfo(r.order.machinery);
+            return (
+              <div key={idx} className="op-row">
+                <div className="op-col op-col-user" data-label="کاربر">
+                  <div className="op-avatar">
+                    <i className="bi bi-person-fill"></i>
                   </div>
-
-                  {/* Contact row */}
-                  <div className="d-flex flex-wrap gap-2 mb-3 small">
-                    <span className="text-secondary">
-                      <i className="bi bi-telephone me-1"></i>
-                      {user.phone}
-                    </span>
-                    <span className="text-secondary">
-                      <i className="bi bi-person-badge me-1"></i>
-                      {user.father_name}
-                    </span>
-                    <span className="text-secondary">
-                      <i className="bi bi-geo-alt me-1"></i>
-                      {user.village}
-                    </span>
+                  <div className="op-user-text">
+                    <span className="op-user-name">{r.user.name}</span>
+                    <span className="op-user-sub">{r.user.national_code}</span>
                   </div>
-
-                  {/* Address */}
-                  <p className="small text-secondary mb-3 border-bottom pb-2">
-                    {user.address}
-                  </p>
-
-                  {/* Machines */}
-                  <h6 className="small fw-bold mb-2">ماشین‌آلات</h6>
-                  {user.machines?.length ? (
-                    <div className="machine-list">
-                      {user.machines.map((m, idx) => {
-                        const type = getMachineType(m);
-                        return (
-                          <div
-                            key={idx}
-                            className="machine-item border-bottom pb-2 mb-2"
-                          >
-                            <div className="d-flex justify-content-between align-items-start">
-                              <div>
-                                <span className="fw-medium">{m.model}</span>
-                                <span className="text-secondary me-2 small">
-                                  ({m.manufacture_year})
-                                </span>
-                                <div className="small text-secondary">
-                                  {type.name} · {type.type} · شناسه {type.id}
-                                </div>
-                              </div>
-                            </div>
-                            {/* Orders */}
-                            {m.order?.map((o, oIdx) => (
-                              <div
-                                key={oIdx}
-                                className="order-item d-flex justify-content-between align-items-center small mt-1 p-1 bg-light"
-                              >
-                                <span
-                                  className={`badge ${
-                                    o.status === "PAID"
-                                      ? "bg-dark text-white"
-                                      : "bg-secondary text-white"
-                                  }`}
-                                >
-                                  {o.payment_method === "CASH"
-                                    ? "نقدی"
-                                    : "اقساطی"}{" "}
-                                  · {o.paid.toLocaleString()} تومان
-                                </span>
-                                <span className="text-secondary">
-                                  {o.status === "PAID"
-                                    ? "پرداخت شده"
-                                    : "در انتظار"}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <span className="small text-secondary">بدون ماشین</span>
-                  )}
+                </div>
+                <div className="op-col op-col-machine" data-label="ماشین">
+                  <span className="op-machine-model">
+                    {r.order.machinery?.model}
+                  </span>
+                  <span className="op-machine-sub">
+                    {info.category}
+                    {info.subType ? ` · ${info.subType}` : ""}
+                    {r.order.machinery?.manufacture_year
+                      ? ` · ${r.order.machinery.manufacture_year}`
+                      : ""}
+                  </span>
+                </div>
+                <div className="op-col op-col-payment" data-label="پرداخت">
+                  <span
+                    className={`op-badge ${
+                      r.order.payment_method === "CASH"
+                        ? "op-badge-green"
+                        : "op-badge-amber"
+                    }`}
+                  >
+                    {r.order.payment_method === "CASH" ? "نقدی" : "اقساطی"}
+                  </span>
+                </div>
+                <div className="op-col op-col-amount" data-label="مبلغ">
+                  {r.order.paid?.toLocaleString()} تومان
+                </div>
+                <div className="op-col op-col-status" data-label="وضعیت">
+                  <span
+                    className={`op-badge op-badge-dot ${
+                      r.order.status === "PAID"
+                        ? "op-badge-green"
+                        : "op-badge-amber"
+                    }`}
+                  >
+                    {r.order.status === "PAID" ? "پرداخت شده" : "در انتظار"}
+                  </span>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
+
+      {!isLoadingAll && !errorAll && (
+        <div className="op-pagination">
+          <div className="op-page-size">
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+            <span>تعداد در صفحه</span>
+          </div>
+          <div className="op-page-nav">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              قبلی ›
+            </button>
+            <span className="op-page-num">{page} / {totalPages}</span>
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              ‹ بعدی
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

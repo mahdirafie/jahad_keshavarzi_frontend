@@ -7,6 +7,7 @@ const useOrderStore = create((set, get) => ({
   orders: [], // logged-in user's orders
   currentOrder: null, // last submitted order
   allUsersOrders: [], // all users with their machines & orders (admin view)
+  ordersCount: { cash: 0, installment: 0, total: 0, today: 0 },
   isLoading: false,
   error: null,
   isLoadingAll: false, // loading for all-users endpoint
@@ -120,7 +121,7 @@ const useOrderStore = create((set, get) => ({
   },
 
   // 3. FETCH ALL USERS ORDERS (admin)
-  fetchAllUsersOrders: async () => {
+  fetchAllUsersOrders: async ({ query = "", page = 1, limit = 10 } = {}) => {
     set({ isLoadingAll: true, errorAll: null });
     try {
       const token = localStorage.getItem("authToken");
@@ -128,11 +129,12 @@ const useOrderStore = create((set, get) => ({
 
       const response = await axios.get(`${BASE_URL}/order/all-users-orders`, {
         headers: { Authorization: `Bearer ${token}` },
+        params: { query: query || undefined, page, limit },
       });
 
-      // The API returns { message, info: [...] }
       set({
         allUsersOrders: response.data.info || [],
+        ordersCount: response.data.count || { cash: 0, installment: 0, total: 0, today: 0 },
         isLoadingAll: false,
       });
       return { success: true, data: response.data.info };
@@ -155,6 +157,7 @@ const useOrderStore = create((set, get) => ({
       orders: [],
       currentOrder: null,
       allUsersOrders: [],
+      ordersCount: { cash: 0, installment: 0, total: 0, today: 0 },
       isLoading: false,
       error: null,
       isLoadingAll: false,

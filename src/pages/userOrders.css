@@ -1,78 +1,644 @@
-/* Modern monochrome design */
-.user-card {
-    background: #ffffff;
-    border-radius: 16px;
-    transition: box-shadow 0.2s ease;
+/* ─── Orders Page – Dark Theme ─── */
+.orders-page {
+    background: #0d1117;
+    min-height: 100vh;
+    padding: 1.5rem 2rem;
+    color: #c9d1d9;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.user-card:hover {
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+/* Header */
+.op-header {
+    margin-bottom: 1.5rem;
 }
 
-.avatar {
-    width: 40px;
-    height: 40px;
-    background: #f8f9fa;
+.op-header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin: 0 0 0.25rem;
 }
 
-/* Search box */
-.search-box {
-    position: relative;
+.op-header p {
+    font-size: 0.85rem;
+    color: #7d8590;
+    margin: 0;
+}
+
+/* ─── Stat Card ─── */
+.op-stats {
     display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.op-stat-card {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1 1 0;
+    min-width: 180px;
+}
+
+.op-stat-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.op-stat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.op-stat-dot.green {
+    background: #3fb950;
+    box-shadow: 0 0 8px rgba(63, 185, 80, 0.4);
+}
+
+.op-stat-dot.blue {
+    background: #58a6ff;
+    box-shadow: 0 0 8px rgba(88, 166, 255, 0.4);
+}
+
+.op-stat-dot.amber {
+    background: #d29922;
+    box-shadow: 0 0 8px rgba(210, 153, 34, 0.4);
+}
+
+.op-stat-dot.purple {
+    background: #bc8cff;
+    box-shadow: 0 0 8px rgba(188, 140, 255, 0.4);
+}
+
+.op-stat-label {
+    color: #7d8590;
+    font-size: 0.95rem;
+}
+
+.op-stat-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #f0f6fc;
+    letter-spacing: -0.5px;
+}
+
+/* ─── Toolbar / Search ─── */
+.op-toolbar {
+    margin-bottom: 1rem;
+}
+
+.op-search {
+    position: relative;
+    display: inline-flex;
     align-items: center;
 }
 
-.search-box i {
+.op-search i {
     position: absolute;
     right: 12px;
+    color: #484f58;
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+.op-search input {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    color: #c9d1d9;
+    padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+    width: 280px;
     font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
 }
 
-.search-box input {
-    padding-right: 35px;
-    width: 220px;
-    border-radius: 30px;
-    border: 1px solid #e9ecef;
-    background: #f8f9fa;
+.op-search input::placeholder {
+    color: #484f58;
 }
 
-.search-box input:focus {
+.op-search input:focus {
     outline: none;
-    border-color: #ced4da;
-    background: #ffffff;
-    box-shadow: none;
+    border-color: #388bfd;
 }
 
-/* Badge */
-.badge.bg-dark {
-    background: #212529 !important;
-    font-weight: 400;
-    padding: 0.35rem 0.65rem;
-}
-
-.badge.bg-secondary {
-    background: #6c757d !important;
-}
-
-/* Order item */
-.order-item {
+/* ─── Table ─── */
+.op-table {
+    background: #0d1117;
+    border: 1px solid #21262d;
     border-radius: 12px;
-    background: #f8f9fa;
-    padding: 0.5rem 0.75rem;
+    overflow: hidden;
 }
 
-/* Machine item */
-.machine-item:last-child {
-    border-bottom: none !important;
+.op-thead {
+    display: flex;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #21262d;
+    color: #7d8590;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .search-box input {
-        width: 180px;
+.op-row {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid #161b22;
+    transition: background 0.15s;
+}
+
+.op-row:last-child {
+    border-bottom: none;
+}
+
+.op-row:hover {
+    background: #161b22;
+}
+
+/* Column widths */
+.op-col-user { flex: 0 0 28%; min-width: 0; }
+.op-col-machine { flex: 0 0 27%; min-width: 0; }
+.op-col-payment { flex: 0 0 13%; min-width: 0; }
+.op-col-amount { flex: 0 0 17%; min-width: 0; }
+.op-col-status { flex: 0 0 15%; min-width: 0; }
+
+/* ─── User Cell ─── */
+.op-row .op-col-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.op-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #21262d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7d8590;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.op-user-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.op-user-name {
+    color: #f0f6fc;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.op-user-sub {
+    color: #484f58;
+    font-size: 0.75rem;
+    direction: ltr;
+    text-align: right;
+}
+
+/* ─── Machine Cell ─── */
+.op-row .op-col-machine {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.op-machine-model {
+    color: #f0f6fc;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.op-machine-sub {
+    color: #484f58;
+    font-size: 0.75rem;
+}
+
+/* ─── Amount Cell ─── */
+.op-col-amount {
+    color: #c9d1d9;
+    font-size: 0.85rem;
+}
+
+/* ─── Badges ─── */
+.op-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.op-badge-dot::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.op-badge-green {
+    background: rgba(63, 185, 80, 0.12);
+    color: #3fb950;
+}
+
+.op-badge-amber {
+    background: rgba(210, 153, 34, 0.12);
+    color: #d29922;
+}
+
+.op-badge-red {
+    background: rgba(248, 81, 73, 0.12);
+    color: #f85149;
+}
+
+/* ─── State Messages (loading / error / empty) ─── */
+.op-state-msg {
+    padding: 3rem;
+    text-align: center;
+    color: #7d8590;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.op-error-msg {
+    color: #f85149;
+}
+
+/* ─── Pagination ─── */
+.op-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    margin-top: 0.5rem;
+}
+
+.op-page-size {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #7d8590;
+    font-size: 0.85rem;
+}
+
+.op-page-size select {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 6px;
+    color: #c9d1d9;
+    padding: 0.3rem 0.5rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+
+.op-page-size select:focus {
+    outline: none;
+    border-color: #388bfd;
+}
+
+.op-page-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.op-page-nav button {
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #c9d1d9;
+    padding: 0.35rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.op-page-nav button:hover:not(:disabled) {
+    background: #30363d;
+}
+
+.op-page-nav button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.op-page-num {
+    color: #f0f6fc;
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-width: 2rem;
+    text-align: center;
+}
+
+/* ─── Responsive ─── */
+
+/* Large desktop – no width cap, fill the viewport */
+
+/* Tablet landscape / small desktop */
+@media (max-width: 1200px) {
+    .op-stat-value {
+        font-size: 1.85rem;
     }
 
-    .user-card .card-body {
-        padding: 1.25rem;
+    .op-stat-card {
+        padding: 1rem 1.25rem;
+    }
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+    .orders-page {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .op-col-user { flex: 0 0 30%; }
+    .op-col-machine { flex: 0 0 25%; }
+    .op-col-payment { flex: 0 0 13%; }
+    .op-col-amount { flex: 0 0 17%; }
+    .op-col-status { flex: 0 0 15%; }
+
+    .op-stat-card {
+        min-width: calc(50% - 0.5rem);
+        flex: 1 1 calc(50% - 0.5rem);
+    }
+
+    .op-stat-value {
+        font-size: 1.65rem;
+    }
+
+    .op-stat-label {
+        font-size: 0.85rem;
+    }
+
+    .op-search input {
+        width: 240px;
+    }
+}
+
+/* Mobile landscape / small tablet */
+@media (max-width: 768px) {
+    .orders-page {
+        padding: 1rem 1rem 5rem;
+    }
+
+    .op-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .op-stat-card {
+        min-width: calc(50% - 0.5rem);
+        flex: 1 1 calc(50% - 0.5rem);
+        padding: 0.85rem 1rem;
+    }
+
+    .op-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .op-stat-label {
+        font-size: 0.8rem;
+    }
+
+    .op-search {
+        width: 100%;
+    }
+
+    .op-search input {
+        width: 100%;
+    }
+
+    .op-thead {
+        display: none;
+    }
+
+    .op-table {
+        border-radius: 10px;
+    }
+
+    .op-row {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-bottom: 1px solid #21262d;
+        position: relative;
+    }
+
+    .op-row .op-col-user,
+    .op-row .op-col-machine {
+        flex: 0 0 100% !important;
+    }
+
+    .op-row .op-col-payment,
+    .op-row .op-col-amount,
+    .op-row .op-col-status {
+        flex: 1 1 0 !important;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .op-row [data-label]::before {
+        content: attr(data-label);
+        color: #7d8590;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.2rem;
+    }
+
+    .op-row .op-col-user::before,
+    .op-row .op-col-machine::before {
+        display: none;
+    }
+
+    .op-pagination {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+
+    .op-page-nav {
+        justify-content: center;
+    }
+
+    .op-page-size {
+        justify-content: center;
+    }
+}
+
+/* Mobile portrait */
+@media (max-width: 576px) {
+    .orders-page {
+        padding: 0.75rem 0.75rem 5rem;
+    }
+
+    .op-header {
+        margin-bottom: 1rem;
+    }
+
+    .op-header h1 {
+        font-size: 1.1rem;
+    }
+
+    .op-header p {
+        font-size: 0.75rem;
+    }
+
+    .op-stats {
+        gap: 0.65rem;
+        margin-bottom: 1rem;
+    }
+
+    .op-stat-card {
+        min-width: calc(50% - 0.35rem);
+        flex: 1 1 calc(50% - 0.35rem);
+        padding: 0.75rem 0.85rem;
+        border-radius: 10px;
+    }
+
+    .op-stat-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .op-stat-left {
+        gap: 0.5rem;
+    }
+
+    .op-stat-label {
+        font-size: 0.72rem;
+    }
+
+    .op-stat-value {
+        font-size: 1.3rem;
+    }
+
+    .op-toolbar {
+        margin-bottom: 0.75rem;
+    }
+
+    .op-search input {
+        font-size: 0.85rem;
+        padding: 0.45rem 2rem 0.45rem 0.65rem;
+    }
+
+    .op-row {
+        padding: 0.85rem;
+        gap: 0.4rem;
+    }
+
+    .op-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    .op-user-name,
+    .op-machine-model {
+        font-size: 0.82rem;
+    }
+
+    .op-user-sub,
+    .op-machine-sub {
+        font-size: 0.7rem;
+    }
+
+    .op-col-amount {
+        font-size: 0.78rem;
+    }
+
+    .op-badge {
+        font-size: 0.68rem;
+        padding: 0.15rem 0.5rem;
+    }
+
+    .op-badge-dot::before {
+        width: 6px;
+        height: 6px;
+    }
+
+    .op-page-nav button {
+        padding: 0.3rem 0.65rem;
+        font-size: 0.8rem;
+    }
+
+    .op-page-num {
+        font-size: 0.8rem;
+    }
+
+    .op-page-size {
+        font-size: 0.8rem;
+    }
+
+    .op-page-size select {
+        font-size: 0.8rem;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 400px) {
+    .orders-page {
+        padding: 0.5rem 0.5rem 5rem;
+    }
+
+    .op-stat-card {
+        padding: 0.65rem 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .op-stat-value {
+        font-size: 1.15rem;
+        align-self: flex-end;
+    }
+
+    .op-stat-label {
+        font-size: 0.68rem;
+    }
+
+    .op-row .op-col-payment,
+    .op-row .op-col-amount,
+    .op-row .op-col-status {
+        flex: 1 1 100% !important;
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .op-row [data-label]::before {
+        margin-bottom: 0;
+        margin-left: 0.5rem;
+    }
+
+    .op-page-nav button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
     }
 }
