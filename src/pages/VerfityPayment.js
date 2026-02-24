@@ -287,8 +287,7 @@ const VerifyPayment = () => {
             </button>
           </div>
 
-          {/* Debug info - you can remove this in production */}
-          <div className="debug-info">
+          {/* <div className="debug-info">
             <details>
               <summary>اطلاعات دیباگ</summary>
               <div className="debug-details">
@@ -297,7 +296,8 @@ const VerifyPayment = () => {
                 <p>Verification Status: {verificationStatus}</p>
               </div>
             </details>
-          </div>
+          </div> */}
+
         </div>
       </div>
     </div>
