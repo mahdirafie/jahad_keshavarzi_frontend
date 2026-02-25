@@ -6,8 +6,9 @@ const useOrderStore = create((set, get) => ({
   // ---------- State ----------
   orders: [], // logged-in user's orders
   currentOrder: null, // last submitted order
-  allUsersOrders: [], // all users with their machines & orders (admin view)
+  allUsersOrders: [], // array of orders (admin view)
   ordersCount: { cash: 0, installment: 0, total: 0, today: 0 },
+  ordersPagination: { currentPage: 1, limit: 10, total: 0, pages: 1 },
   isLoading: false,
   error: null,
   isLoadingAll: false, // loading for all-users endpoint
@@ -135,6 +136,7 @@ const useOrderStore = create((set, get) => ({
       set({
         allUsersOrders: response.data.info || [],
         ordersCount: response.data.count || { cash: 0, installment: 0, total: 0, today: 0 },
+        ordersPagination: response.data.pagination || { currentPage: 1, limit: 10, total: 0, pages: 1 },
         isLoadingAll: false,
       });
       return { success: true, data: response.data.info };
@@ -148,16 +150,40 @@ const useOrderStore = create((set, get) => ({
     }
   },
 
-  // 4. UTILITY: clear error
+  // 4. CHANGE ORDER PAYMENT METHOD (admin)
+  changeOrderPaymentMethod: async (orderId, refreshFn) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("لطفاً وارد حساب کاربری خود شوید");
+
+      await axios.patch(
+        `${BASE_URL}/order/change-payment-method/${orderId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (typeof refreshFn === "function") refreshFn();
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "خطا در تغییر روش پرداخت";
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  // 5. UTILITY: clear error
   clearError: () => set({ error: null, errorAll: null }),
 
-  // 5. RESET STORE (e.g., on logout)
+  // 6. RESET STORE (e.g., on logout)
   reset: () =>
     set({
       orders: [],
       currentOrder: null,
       allUsersOrders: [],
       ordersCount: { cash: 0, installment: 0, total: 0, today: 0 },
+      ordersPagination: { currentPage: 1, limit: 10, total: 0, pages: 1 },
       isLoading: false,
       error: null,
       isLoadingAll: false,

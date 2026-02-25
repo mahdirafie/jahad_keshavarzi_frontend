@@ -1,6 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import useOrderStore from "../stores/orderStore";
+import { formatDate } from "../utils/DateFormat";
+import BASE_URL from "../common/baseUrl";
+import ConfirmModal from "../modals/ConfirmModal";
+import useCustomSnackbar from "../hooks/useSnackBar";
 import "./userOrders.css";
+
+const getProfileImageUrl = (profileImage) => {
+  if (!profileImage) return null;
+  if (profileImage.startsWith("http")) return profileImage;
+  if (profileImage.startsWith("/")) return `${BASE_URL}${profileImage}`;
+  return `${BASE_URL}/${profileImage}`;
+};
 
 const TRACTOR_TYPE_FA = {
   ROMANIAN_UNIVERSAL: "یونیورسال رومانی",
@@ -42,20 +53,38 @@ const getMachineInfo = (machinery) => {
   return { category: "نامشخص", subType: "" };
 };
 
+const PAYMENT_FA = { CASH: "نقدی", INSTALLMENT: "اقساطی" };
+
 const UserOrders = () => {
   const {
     allUsersOrders,
     ordersCount,
+    ordersPagination,
     isLoadingAll,
     errorAll,
     fetchAllUsersOrders,
+    changeOrderPaymentMethod,
     clearError,
   } = useOrderStore();
+  const { showSnackbar } = useCustomSnackbar();
 
   const [searchInput, setSearchInput] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [confirmOrder, setConfirmOrder] = useState(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -71,14 +100,9 @@ const UserOrders = () => {
 
   useEffect(() => () => clearError(), [clearError]);
 
-  const rows = [];
-  allUsersOrders?.forEach((user) => {
-    user.orders?.forEach((order) => {
-      rows.push({ user, order });
-    });
-  });
-
-  const totalPages = Math.max(1, Math.ceil(ordersCount.total / limit));
+  const orders = allUsersOrders || [];
+  const totalPages = ordersPagination?.pages ?? 1;
+  const currentPage = ordersPagination?.currentPage ?? page;
 
   return (
     <div className="orders-page" dir="rtl">
@@ -136,7 +160,9 @@ const UserOrders = () => {
           <span className="op-col op-col-machine">ماشین</span>
           <span className="op-col op-col-payment">پرداخت</span>
           <span className="op-col op-col-amount">مبلغ</span>
+          <span className="op-col op-col-date">تاریخ</span>
           <span className="op-col op-col-status">وضعیت</span>
+          <span className="op-col op-col-actions"></span>
         </div>
 
         {isLoadingAll ? (
@@ -146,58 +172,100 @@ const UserOrders = () => {
           </div>
         ) : errorAll ? (
           <div className="op-state-msg op-error-msg">{errorAll}</div>
-        ) : rows.length === 0 ? (
+        ) : orders.length === 0 ? (
           <div className="op-state-msg">نتیجه‌ای یافت نشد.</div>
         ) : (
-          rows.map((r, idx) => {
-            const info = getMachineInfo(r.order.machinery);
+          orders.map((order) => {
+            const info = getMachineInfo(order.machinery);
+            const user = order.user || {};
+            const profileUrl = getProfileImageUrl(user.profile_image);
             return (
-              <div key={idx} className="op-row">
+              <div key={order.oid} className="op-row">
                 <div className="op-col op-col-user" data-label="کاربر">
                   <div className="op-avatar">
-                    <i className="bi bi-person-fill"></i>
+                    {profileUrl ? (
+                      <img src={profileUrl} alt="" />
+                    ) : (
+                      <i className="bi bi-person-fill"></i>
+                    )}
                   </div>
                   <div className="op-user-text">
-                    <span className="op-user-name">{r.user.name}</span>
-                    <span className="op-user-sub">{r.user.national_code}</span>
+                    <span className="op-user-name">{user.name}</span>
+                    <span className="op-user-sub">{user.national_code}</span>
                   </div>
                 </div>
                 <div className="op-col op-col-machine" data-label="ماشین">
                   <span className="op-machine-model">
-                    {r.order.machinery?.model}
+                    {order.machinery?.model}
                   </span>
                   <span className="op-machine-sub">
                     {info.category}
                     {info.subType ? ` · ${info.subType}` : ""}
-                    {r.order.machinery?.manufacture_year
-                      ? ` · ${r.order.machinery.manufacture_year}`
+                    {order.machinery?.manufacture_year
+                      ? ` · ${order.machinery.manufacture_year}`
                       : ""}
                   </span>
                 </div>
                 <div className="op-col op-col-payment" data-label="پرداخت">
                   <span
                     className={`op-badge ${
-                      r.order.payment_method === "CASH"
+                      order.payment_method === "CASH"
                         ? "op-badge-green"
                         : "op-badge-amber"
                     }`}
                   >
-                    {r.order.payment_method === "CASH" ? "نقدی" : "اقساطی"}
+                    {order.payment_method === "CASH" ? "نقدی" : "اقساطی"}
                   </span>
                 </div>
                 <div className="op-col op-col-amount" data-label="مبلغ">
-                  {r.order.paid?.toLocaleString()} تومان
+                  {order.paid?.toLocaleString()} تومان
+                </div>
+                <div className="op-col op-col-date" data-label="تاریخ">
+                  {order.createdAt ? formatDate(order.createdAt) : "—"}
                 </div>
                 <div className="op-col op-col-status" data-label="وضعیت">
                   <span
                     className={`op-badge op-badge-dot ${
-                      r.order.status === "PAID"
+                      order.status === "PAID"
                         ? "op-badge-green"
                         : "op-badge-amber"
                     }`}
                   >
-                    {r.order.status === "PAID" ? "پرداخت شده" : "در انتظار"}
+                    {order.status === "PAID" ? "پرداخت شده" : "در انتظار"}
                   </span>
+                </div>
+                <div
+                  className="op-col op-col-actions"
+                  data-label="عملیات"
+                  ref={openMenuId === order.oid ? menuRef : null}
+                >
+                  <div className="op-row-menu-wrap">
+                    <button
+                      type="button"
+                      className="op-row-menu-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === order.oid ? null : order.oid);
+                      }}
+                      aria-label="منو"
+                    >
+                      <i className="bi bi-three-dots-vertical"></i>
+                    </button>
+                    {openMenuId === order.oid && (
+                      <div className="op-row-dropdown">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setConfirmOrder(order);
+                            setOpenMenuId(null);
+                          }}
+                        >
+                          <i className="bi bi-arrow-left-right"></i>
+                          تغییر روش پرداخت
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -223,14 +291,14 @@ const UserOrders = () => {
           </div>
           <div className="op-page-nav">
             <button
-              disabled={page <= 1}
+              disabled={currentPage <= 1}
               onClick={() => setPage((p) => p - 1)}
             >
               قبلی ›
             </button>
-            <span className="op-page-num">{page} / {totalPages}</span>
+            <span className="op-page-num">{currentPage} / {totalPages}</span>
             <button
-              disabled={page >= totalPages}
+              disabled={currentPage >= totalPages}
               onClick={() => setPage((p) => p + 1)}
             >
               ‹ بعدی
@@ -238,6 +306,30 @@ const UserOrders = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmOrder}
+        title="تغییر روش پرداخت"
+        message={
+          confirmOrder
+            ? `آیا مطمئن هستید که می‌خواهید روش پرداخت را از ${PAYMENT_FA[confirmOrder.payment_method]} به ${PAYMENT_FA[confirmOrder.payment_method === "CASH" ? "INSTALLMENT" : "CASH"]} تغییر دهید؟`
+            : ""
+        }
+        onConfirm={async () => {
+          if (!confirmOrder) return;
+          const ok = await changeOrderPaymentMethod(
+            confirmOrder.oid,
+            () => fetchAllUsersOrders({ query, page, limit })
+          );
+          setConfirmOrder(null);
+          if (ok.success) {
+            showSnackbar("وضعیت پرداخت با موفقیت تغییر کرد!", "success");
+          } else {
+            showSnackbar(ok.error, "error");
+          }
+        }}
+        onCancel={() => setConfirmOrder(null)}
+      />
     </div>
   );
 };

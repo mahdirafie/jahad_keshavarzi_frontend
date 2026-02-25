@@ -136,11 +136,13 @@
     background: #0d1117;
     border: 1px solid #21262d;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .op-thead {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.9fr 1.2fr 1.2fr 1.1fr 44px;
+    gap: 0.5rem;
     padding: 0.75rem 1.25rem;
     border-bottom: 1px solid #21262d;
     color: #7d8590;
@@ -149,7 +151,9 @@
 }
 
 .op-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.9fr 1.2fr 1.2fr 1.1fr 44px;
+    gap: 0.5rem;
     align-items: center;
     padding: 0.85rem 1.25rem;
     border-bottom: 1px solid #161b22;
@@ -164,12 +168,14 @@
     background: #161b22;
 }
 
-/* Column widths */
-.op-col-user { flex: 0 0 28%; min-width: 0; }
-.op-col-machine { flex: 0 0 27%; min-width: 0; }
-.op-col-payment { flex: 0 0 13%; min-width: 0; }
-.op-col-amount { flex: 0 0 17%; min-width: 0; }
-.op-col-status { flex: 0 0 15%; min-width: 0; }
+/* Column widths (grid handles alignment) */
+.op-col-user { min-width: 0; }
+.op-col-machine { min-width: 0; }
+.op-col-payment { min-width: 0; }
+.op-col-amount { min-width: 0; }
+.op-col-date { min-width: 0; }
+.op-col-status { min-width: 0; }
+.op-col-actions { min-width: 44px; }
 
 /* ─── User Cell ─── */
 .op-row .op-col-user {
@@ -189,6 +195,13 @@
     color: #7d8590;
     font-size: 1rem;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.op-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .op-user-text {
@@ -238,6 +251,12 @@
     font-size: 0.85rem;
 }
 
+/* ─── Date Cell ─── */
+.op-col-date {
+    color: #7d8590;
+    font-size: 0.8rem;
+}
+
 /* ─── Badges ─── */
 .op-badge {
     display: inline-flex;
@@ -272,6 +291,80 @@
 .op-badge-red {
     background: rgba(248, 81, 73, 0.12);
     color: #f85149;
+}
+
+/* ─── Row menu (3 dots) ─── */
+.op-col-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.op-row-menu-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.op-row-menu-btn {
+    background: none;
+    border: none;
+    color: #7d8590;
+    padding: 0.35rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+    font-size: 1.25rem;
+}
+
+.op-row-menu-btn i {
+    font-size: 1.25rem;
+}
+
+.op-row-menu-btn:hover {
+    color: #f0f6fc;
+    background: #21262d;
+}
+
+.op-row-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: auto;
+    margin-top: 0.25rem;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    min-width: 180px;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.op-row-dropdown button {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    background: none;
+    border: none;
+    color: #c9d1d9;
+    font-family: inherit;
+    font-size: 0.85rem;
+    text-align: right;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.15s;
+}
+
+.op-row-dropdown button:hover {
+    background: #21262d;
+}
+
+.op-row-dropdown button i {
+    font-size: 1rem;
 }
 
 /* ─── State Messages (loading / error / empty) ─── */
@@ -377,11 +470,10 @@
         padding: 1.25rem 1.5rem;
     }
 
-    .op-col-user { flex: 0 0 30%; }
-    .op-col-machine { flex: 0 0 25%; }
-    .op-col-payment { flex: 0 0 13%; }
-    .op-col-amount { flex: 0 0 17%; }
-    .op-col-status { flex: 0 0 15%; }
+    .op-thead,
+    .op-row {
+        grid-template-columns: 1.2fr 1.1fr 0.8fr 1fr 1fr 1fr 44px;
+    }
 
     .op-stat-card {
         min-width: calc(50% - 0.5rem);
@@ -442,6 +534,7 @@
     }
 
     .op-row {
+        display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         padding: 1rem;
@@ -456,6 +549,7 @@
 
     .op-row .op-col-payment,
     .op-row .op-col-amount,
+    .op-row .op-col-date,
     .op-row .op-col-status {
         flex: 1 1 0 !important;
         min-width: 0;
@@ -475,6 +569,20 @@
     .op-row .op-col-user::before,
     .op-row .op-col-machine::before {
         display: none;
+    }
+
+    .op-row .op-col-actions {
+        flex: 0 0 100% !important;
+        justify-content: flex-end;
+    }
+
+    .op-row .op-col-actions::before {
+        display: none;
+    }
+
+    .op-row-dropdown {
+        min-width: 160px;
+        max-width: min(180px, calc(100vw - 2rem));
     }
 
     .op-pagination {
@@ -625,6 +733,7 @@
 
     .op-row .op-col-payment,
     .op-row .op-col-amount,
+    .op-row .op-col-date,
     .op-row .op-col-status {
         flex: 1 1 100% !important;
         flex-direction: row !important;
