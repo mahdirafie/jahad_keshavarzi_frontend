@@ -9,6 +9,7 @@ const useOrderStore = create((set, get) => ({
   allUsersOrders: [], // array of orders (admin view)
   ordersCount: { cash: 0, installment: 0, total: 0, today: 0 },
   ordersPagination: { currentPage: 1, limit: 10, total: 0, pages: 1 },
+  appliedFilters: { payment_method: null, status: null, search: null },
   isLoading: false,
   error: null,
   isLoadingAll: false, // loading for all-users endpoint
@@ -122,21 +123,26 @@ const useOrderStore = create((set, get) => ({
   },
 
   // 3. FETCH ALL USERS ORDERS (admin)
-  fetchAllUsersOrders: async ({ query = "", page = 1, limit = 10 } = {}) => {
+  fetchAllUsersOrders: async ({ query = "", page = 1, limit = 10, payment_method, status } = {}) => {
     set({ isLoadingAll: true, errorAll: null });
     try {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("لطفاً وارد حساب کاربری خود شوید");
 
+      const params = { query: query || undefined, page, limit };
+      if (payment_method) params.payment_method = payment_method;
+      if (status) params.status = status;
+
       const response = await axios.get(`${BASE_URL}/order/all-users-orders`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { query: query || undefined, page, limit },
+        params,
       });
 
       set({
         allUsersOrders: response.data.info || [],
         ordersCount: response.data.count || { cash: 0, installment: 0, total: 0, today: 0 },
         ordersPagination: response.data.pagination || { currentPage: 1, limit: 10, total: 0, pages: 1 },
+        appliedFilters: response.data.appliedFilters || { payment_method: null, status: null, search: null },
         isLoadingAll: false,
       });
       return { success: true, data: response.data.info };
@@ -173,10 +179,33 @@ const useOrderStore = create((set, get) => ({
     }
   },
 
-  // 5. UTILITY: clear error
+  // 5. CHANGE ORDER STATUS (admin)
+  changeOrderStatus: async (orderId, status, phone, refreshFn) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("لطفاً وارد حساب کاربری خود شوید");
+
+      await axios.patch(
+        `${BASE_URL}/order/change-status/${orderId}`,
+        { status, phone },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (typeof refreshFn === "function") refreshFn();
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "خطا در تغییر وضعیت سفارش";
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  // 6. UTILITY: clear error
   clearError: () => set({ error: null, errorAll: null }),
 
-  // 6. RESET STORE (e.g., on logout)
+  // 7. RESET STORE (e.g., on logout)
   reset: () =>
     set({
       orders: [],
@@ -184,6 +213,7 @@ const useOrderStore = create((set, get) => ({
       allUsersOrders: [],
       ordersCount: { cash: 0, installment: 0, total: 0, today: 0 },
       ordersPagination: { currentPage: 1, limit: 10, total: 0, pages: 1 },
+      appliedFilters: { payment_method: null, status: null, search: null },
       isLoading: false,
       error: null,
       isLoadingAll: false,

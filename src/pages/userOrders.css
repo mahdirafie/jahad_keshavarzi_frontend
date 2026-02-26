@@ -94,6 +94,10 @@
 /* ─── Toolbar / Search ─── */
 .op-toolbar {
     margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .op-search {
@@ -129,6 +133,38 @@
 .op-search input:focus {
     outline: none;
     border-color: #388bfd;
+}
+
+.op-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.op-filter-select {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    color: #c9d1d9;
+    padding: 0.5rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    min-width: 140px;
+}
+
+.op-filter-select:focus {
+    outline: none;
+    border-color: #388bfd;
+}
+
+.op-filter-select option {
+    background: #161b22;
+    color: #c9d1d9;
+}
+
+.op-toolbar-stats {
+    font-size: 0.8rem;
+    color: #7d8590;
 }
 
 /* ─── Table ─── */
@@ -288,6 +324,11 @@
     color: #d29922;
 }
 
+.op-badge-blue {
+    background: rgba(88, 166, 255, 0.12);
+    color: #58a6ff;
+}
+
 .op-badge-red {
     background: rgba(248, 81, 73, 0.12);
     color: #f85149;
@@ -338,7 +379,7 @@
     border: 1px solid #21262d;
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    min-width: 180px;
+    min-width: 200px;
     z-index: 100;
     overflow: hidden;
 }
@@ -350,13 +391,15 @@
     border: none;
     color: #c9d1d9;
     font-family: inherit;
-    font-size: 0.85rem;
+    font-weight: 400;
+    font-size: clamp(0.75rem, 2vw, 0.9rem);
     text-align: right;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     transition: background 0.15s;
+    white-space: nowrap;
 }
 
 .op-row-dropdown button:hover {
@@ -364,7 +407,88 @@
 }
 
 .op-row-dropdown button i {
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    flex-shrink: 0;
+}
+
+/* ─── Status change modal ─── */
+.op-status-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.op-status-modal-hint {
+    margin: 0;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.op-status-modal-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.op-status-modal-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #fff;
+    min-width: 200px;
+}
+
+.op-status-modal-select:focus {
+    outline: none;
+    border-color: #388bfd;
+}
+
+.op-status-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+.op-status-modal-cancel {
+    padding: 0.5rem 1.25rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #555;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.op-status-modal-cancel:hover {
+    background: #f5f5f5;
+}
+
+.op-status-modal-confirm {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    background: #388bfd;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.op-status-modal-confirm:hover {
+    background: #2c7ae0;
+}
+
+.op-status-modal-confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.op-status-modal-confirm:disabled:hover {
+    background: #388bfd;
 }
 
 /* ─── State Messages (loading / error / empty) ─── */
@@ -491,6 +615,10 @@
     .op-search input {
         width: 240px;
     }
+
+    .op-filter-select {
+        min-width: 120px;
+    }
 }
 
 /* Mobile landscape / small tablet */
@@ -521,8 +649,26 @@
         width: 100%;
     }
 
+    .op-search {
+        flex: 1 1 100%;
+    }
+
     .op-search input {
         width: 100%;
+    }
+
+    .op-filters {
+        flex: 1 1 100%;
+    }
+
+    .op-filter-select {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .op-toolbar-stats {
+        flex: 0 0 100%;
+        font-size: 0.75rem;
     }
 
     .op-thead {
@@ -582,7 +728,21 @@
 
     .op-row-dropdown {
         min-width: 160px;
-        max-width: min(180px, calc(100vw - 2rem));
+        max-width: min(200px, calc(100vw - 2rem));
+    }
+
+    .op-row-dropdown button {
+        padding: 0.55rem 0.9rem;
+        font-size: 0.82rem;
+    }
+
+    .op-row-dropdown button i {
+        font-size: 0.95rem;
+    }
+
+    .op-row-menu-btn,
+    .op-row-menu-btn i {
+        font-size: 1.1rem;
     }
 
     .op-pagination {
@@ -707,6 +867,28 @@
     .op-page-size select {
         font-size: 0.8rem;
     }
+
+    .op-row-dropdown button {
+        font-size: 0.78rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .op-row-dropdown button i {
+        font-size: 0.9rem;
+    }
+
+    .op-row-menu-btn,
+    .op-row-menu-btn i {
+        font-size: 1rem;
+    }
+
+    .op-status-modal-select {
+        font-size: 0.9rem;
+    }
+
+    .op-status-modal-actions button {
+        font-size: 0.85rem;
+    }
 }
 
 /* Very small screens */
@@ -750,4 +932,125 @@
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
     }
+
+    .op-row-dropdown button {
+        font-size: 0.75rem;
+        padding: 0.45rem 0.75rem;
+    }
+
+    .op-row-dropdown button i {
+        font-size: 0.85rem;
+    }
+
+    .op-row-menu-btn,
+    .op-row-menu-btn i {
+        font-size: 0.95rem;
+    }
+
+    .op-status-modal-select {
+        font-size: 0.85rem;
+        min-width: 100%;
+    }
+
+    .op-status-modal-actions {
+        flex-direction: column;
+    }
+
+    .op-status-modal-actions button {
+        width: 100%;
+    }
+}
+
+/* ─── Dark theme for modals (ConfirmModal, Status Modal) ─── */
+.modal-container.modal-dark {
+    background: #161b22;
+    border: 1px solid #21262d;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-container.modal-dark .modal-header {
+    border-bottom-color: #21262d;
+}
+
+.modal-container.modal-dark .modal-title {
+    color: #f0f6fc;
+}
+
+.modal-container.modal-dark .modal-close-button {
+    color: #7d8590;
+}
+
+.modal-container.modal-dark .modal-close-button:hover {
+    color: #c9d1d9;
+    background-color: #21262d;
+}
+
+.modal-container.modal-dark .modal-content {
+    color: #c9d1d9;
+}
+
+/* ConfirmModal dark */
+.modal-container.modal-dark .confirm-modal-content p {
+    color: #c9d1d9;
+}
+
+.modal-container.modal-dark .confirm-btn-cancel {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+
+.modal-container.modal-dark .confirm-btn-cancel:hover {
+    background: #30363d;
+}
+
+.modal-container.modal-dark .confirm-btn-confirm {
+    background: #388bfd;
+    border-color: #388bfd;
+}
+
+.modal-container.modal-dark .confirm-btn-confirm:hover {
+    background: #2c7ae0;
+}
+
+/* Status modal dark */
+.modal-container.modal-dark .op-status-modal-hint {
+    color: #7d8590;
+}
+
+.modal-container.modal-dark .op-status-modal-hint strong {
+    color: #f0f6fc;
+}
+
+.modal-container.modal-dark .op-status-modal-label {
+    color: #c9d1d9;
+}
+
+.modal-container.modal-dark .op-status-modal-select {
+    background: #0d1117;
+    border-color: #21262d;
+    color: #c9d1d9;
+}
+
+.modal-container.modal-dark .op-status-modal-select option {
+    background: #161b22;
+    color: #c9d1d9;
+}
+
+.modal-container.modal-dark .op-status-modal-cancel {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+
+.modal-container.modal-dark .op-status-modal-cancel:hover {
+    background: #30363d;
+}
+
+.modal-container.modal-dark .op-status-modal-confirm {
+    background: #388bfd;
+}
+
+.modal-container.modal-dark .op-status-modal-confirm:hover:not(:disabled) {
+    background: #2c7ae0;
 }

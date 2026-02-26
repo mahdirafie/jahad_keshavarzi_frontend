@@ -3,6 +3,7 @@ import useOrderStore from "../stores/orderStore";
 import { formatDate } from "../utils/DateFormat";
 import BASE_URL from "../common/baseUrl";
 import ConfirmModal from "../modals/ConfirmModal";
+import Modal from "../modals/Modal";
 import useCustomSnackbar from "../hooks/useSnackBar";
 import "./userOrders.css";
 
@@ -55,6 +56,26 @@ const getMachineInfo = (machinery) => {
 
 const PAYMENT_FA = { CASH: "نقدی", INSTALLMENT: "اقساطی" };
 
+const ORDER_STATUS_FA = {
+  PENDING: "در انتظار",
+  PAID: "پرداخت شده",
+  AWAITING_BALANCE: "در انتظار مانده",
+  IN_PREPARATION: "در حال آماده‌سازی",
+  READY_FOR_INSTALLATION: "آماده نصب",
+  INSTALLED: "نصب شده",
+  COMPLETED: "تکمیل شده",
+};
+
+const ORDER_STATUSES = [
+  "PENDING",
+  "PAID",
+  "AWAITING_BALANCE",
+  "IN_PREPARATION",
+  "READY_FOR_INSTALLATION",
+  "INSTALLED",
+  "COMPLETED",
+];
+
 const UserOrders = () => {
   const {
     allUsersOrders,
@@ -64,6 +85,7 @@ const UserOrders = () => {
     errorAll,
     fetchAllUsersOrders,
     changeOrderPaymentMethod,
+    changeOrderStatus,
     clearError,
   } = useOrderStore();
   const { showSnackbar } = useCustomSnackbar();
@@ -72,8 +94,12 @@ const UserOrders = () => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [filterPaymentMethod, setFilterPaymentMethod] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const [confirmOrder, setConfirmOrder] = useState(null);
+  const [statusChangeOrder, setStatusChangeOrder] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -95,14 +121,28 @@ const UserOrders = () => {
   }, [searchInput]);
 
   useEffect(() => {
-    fetchAllUsersOrders({ query, page, limit });
-  }, [query, page, limit, fetchAllUsersOrders]);
+    fetchAllUsersOrders({
+      query,
+      page,
+      limit,
+      payment_method: filterPaymentMethod || undefined,
+      status: filterStatus || undefined,
+    });
+  }, [query, page, limit, filterPaymentMethod, filterStatus, fetchAllUsersOrders]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filterPaymentMethod, filterStatus]);
 
   useEffect(() => () => clearError(), [clearError]);
 
   const orders = allUsersOrders || [];
   const totalPages = ordersPagination?.pages ?? 1;
   const currentPage = ordersPagination?.currentPage ?? page;
+  const totalFiltered = ordersPagination?.total ?? 0;
+  const limitVal = ordersPagination?.limit ?? limit;
+  const startItem = totalFiltered > 0 ? (currentPage - 1) * limitVal + 1 : 0;
+  const endItem = Math.min(currentPage * limitVal, totalFiltered);
 
   return (
     <div className="orders-page" dir="rtl">
@@ -152,6 +192,38 @@ const UserOrders = () => {
             onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
+        <div className="op-filters">
+          <select
+            className="op-filter-select"
+            value={filterPaymentMethod}
+            onChange={(e) => setFilterPaymentMethod(e.target.value)}
+          >
+            <option value="">روش پرداخت</option>
+            <option value="CASH">نقدی</option>
+            <option value="INSTALLMENT">اقساطی</option>
+          </select>
+          <select
+            className="op-filter-select"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="">وضعیت سفارش</option>
+            {ORDER_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {ORDER_STATUS_FA[s]}
+              </option>
+            ))}
+          </select>
+        </div>
+        {!isLoadingAll && !errorAll && (
+          <span className="op-toolbar-stats">
+            {totalFiltered === 0
+              ? "۰ نتیجه"
+              : totalPages > 1
+              ? `نمایش ${startItem}–${endItem} از ${totalFiltered.toLocaleString("fa-IR")} نتیجه`
+              : `${totalFiltered.toLocaleString("fa-IR")} نتیجه`}
+          </span>
+        )}
       </div>
 
       <div className="op-table">
@@ -226,12 +298,14 @@ const UserOrders = () => {
                 <div className="op-col op-col-status" data-label="وضعیت">
                   <span
                     className={`op-badge op-badge-dot ${
-                      order.status === "PAID"
+                      order.status === "PAID" || order.status === "COMPLETED" || order.status === "INSTALLED"
                         ? "op-badge-green"
-                        : "op-badge-amber"
+                        : order.status === "PENDING"
+                        ? "op-badge-amber"
+                        : "op-badge-blue"
                     }`}
                   >
-                    {order.status === "PAID" ? "پرداخت شده" : "در انتظار"}
+                    {ORDER_STATUS_FA[order.status] || order.status}
                   </span>
                 </div>
                 <div
@@ -262,6 +336,17 @@ const UserOrders = () => {
                         >
                           <i className="bi bi-arrow-left-right"></i>
                           تغییر روش پرداخت
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStatusChangeOrder(order);
+                            setSelectedStatus(order.status || "PAID");
+                            setOpenMenuId(null);
+                          }}
+                        >
+                          <i className="bi bi-pencil-square"></i>
+                          تغییر وضعیت سفارش
                         </button>
                       </div>
                     )}
@@ -310,6 +395,7 @@ const UserOrders = () => {
       <ConfirmModal
         isOpen={!!confirmOrder}
         title="تغییر روش پرداخت"
+        className="modal-dark"
         message={
           confirmOrder
             ? `آیا مطمئن هستید که می‌خواهید روش پرداخت را از ${PAYMENT_FA[confirmOrder.payment_method]} به ${PAYMENT_FA[confirmOrder.payment_method === "CASH" ? "INSTALLMENT" : "CASH"]} تغییر دهید؟`
@@ -319,7 +405,14 @@ const UserOrders = () => {
           if (!confirmOrder) return;
           const ok = await changeOrderPaymentMethod(
             confirmOrder.oid,
-            () => fetchAllUsersOrders({ query, page, limit })
+            () =>
+              fetchAllUsersOrders({
+                query,
+                page,
+                limit,
+                payment_method: filterPaymentMethod || undefined,
+                status: filterStatus || undefined,
+              })
           );
           setConfirmOrder(null);
           if (ok.success) {
@@ -330,6 +423,79 @@ const UserOrders = () => {
         }}
         onCancel={() => setConfirmOrder(null)}
       />
+
+      <Modal
+        isOpen={!!statusChangeOrder}
+        onClose={() => {
+          setStatusChangeOrder(null);
+          setSelectedStatus("");
+        }}
+        title="تغییر وضعیت سفارش"
+        className="modal-dark"
+      >
+        {statusChangeOrder && (
+          <div className="op-status-modal">
+            <p className="op-status-modal-hint">
+              وضعیت فعلی: <strong>{ORDER_STATUS_FA[statusChangeOrder.status]}</strong>
+            </p>
+            <label className="op-status-modal-label">وضعیت جدید:</label>
+            <select
+              className="op-status-modal-select"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              {ORDER_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {ORDER_STATUS_FA[s]}
+                </option>
+              ))}
+            </select>
+            <div className="op-status-modal-actions">
+              <button
+                type="button"
+                className="op-status-modal-cancel"
+                onClick={() => {
+                  setStatusChangeOrder(null);
+                  setSelectedStatus("");
+                }}
+              >
+                لغو
+              </button>
+              <button
+                type="button"
+                className="op-status-modal-confirm"
+                disabled={selectedStatus === statusChangeOrder.status}
+                onClick={async () => {
+                  if (!statusChangeOrder || !selectedStatus || selectedStatus === statusChangeOrder.status) return;
+                  const phone = statusChangeOrder.user?.phone || "";
+                  const ok = await changeOrderStatus(
+                    statusChangeOrder.oid,
+                    selectedStatus,
+                    phone,
+                    () =>
+                      fetchAllUsersOrders({
+                        query,
+                        page,
+                        limit,
+                        payment_method: filterPaymentMethod || undefined,
+                        status: filterStatus || undefined,
+                      })
+                  );
+                  setStatusChangeOrder(null);
+                  setSelectedStatus("");
+                  if (ok.success) {
+                    showSnackbar("وضعیت سفارش با موفقیت تغییر کرد!", "success");
+                  } else {
+                    showSnackbar(ok.error, "error");
+                  }
+                }}
+              >
+                تأیید
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

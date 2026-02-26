@@ -7,10 +7,11 @@ export default function ConfirmModal({
   onConfirm,
   onCancel,
   message,
-  title
+  title,
+  className = "",
 }) {
   return (
-    <Modal isOpen={isOpen} onClose={onCancel} title={title}>
+    <Modal isOpen={isOpen} onClose={onCancel} title={title} className={className}>
       <div className="confirm-modal-content">
         <p>{message}</p>
         <div className="confirm-modal-actions">
