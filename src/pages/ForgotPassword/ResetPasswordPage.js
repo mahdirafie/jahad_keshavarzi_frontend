@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import backgroundImage from "../../assets/images/background.jpg";
-import BASE_URL from "../../common/baseUrl";
+import apiClient from "../../common/apiClient";
 import useCustomSnackbar from "../../hooks/useSnackBar";
 
 export default function ResetPasswordPage() {
@@ -73,22 +73,13 @@ export default function ResetPasswordPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${BASE_URL}/user/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          national_code,
-          new_password: formData.password,
-        }),
+      await apiClient.post("/user/reset-password", {
+        national_code,
+        new_password: formData.password,
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        showSnackbar("رمز عبور با موفقیت تغییر کرد", "success");
-        navigate('/login');
-      } else {
-        throw new Error(data.message || "خطا در تغییر رمز عبور");
-      }
+      showSnackbar("رمز عبور با موفقیت تغییر کرد", "success");
+      navigate('/login');
     } catch (error) {
       showSnackbar(error.message, "error");
     } finally {

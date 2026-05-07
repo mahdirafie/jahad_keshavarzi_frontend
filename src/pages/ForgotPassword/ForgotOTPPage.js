@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import backgroundImage from "../../assets/images/background.jpg";
-import BASE_URL from "../../common/baseUrl";
+import apiClient from "../../common/apiClient";
 import useCustomSnackbar from "../../hooks/useSnackBar";
 
 export default function ForgotOTPPage() {
@@ -77,23 +77,13 @@ export default function ForgotOTPPage() {
     const otpCode = otp.join("");
 
     try {
-      const response = await fetch(`${BASE_URL}/otp/verify-forgot-password-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          national_code: national_code,
-          code: otpCode,
-        }),
+      await apiClient.post("/otp/verify-forgot-password-otp", {
+        national_code: national_code,
+        code: otpCode,
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        showSnackbar("کد تأیید صحیح است", "success");
-        // Navigate to reset password page with national code
-        navigate("/reset-password", { state: { national_code } });
-      } else {
-        throw new Error(data.message || "کد نامعتبر است");
-      }
+      showSnackbar("کد تأیید صحیح است", "success");
+      navigate("/reset-password", { state: { national_code } });
     } catch (error) {
       showSnackbar(error.message, "error");
     } finally {
@@ -104,22 +94,13 @@ export default function ForgotOTPPage() {
   const handleResend = async () => {
     if (!canResend) return;
     try {
-      const response = await fetch(`${BASE_URL}/otp/reset-password-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ national_code }),
-      });
+      await apiClient.post("/otp/reset-password-otp", { national_code });
 
-      const data = await response.json();
-      if (response.ok) {
-        setResendTimer(120);
-        setCanResend(false);
-        setOtp(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
-        showSnackbar("کد جدید ارسال شد", "success");
-      } else {
-        throw new Error(data.message || "خطا در ارسال مجدد");
-      }
+      setResendTimer(120);
+      setCanResend(false);
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+      showSnackbar("کد جدید ارسال شد", "success");
     } catch (error) {
       showSnackbar(error.message, "error");
     }

@@ -1,18 +1,18 @@
 import { create } from "zustand";
-import axios from "axios";
-import BASE_URL from "../common/baseUrl";
+import apiClient from "../common/apiClient";
+import adminApiClient from "../common/adminApiClient";
 
 const useOrderStore = create((set, get) => ({
   // ---------- State ----------
-  orders: [], // logged-in user's orders
-  currentOrder: null, // last submitted order
-  allUsersOrders: [], // array of orders (admin view)
+  orders: [],
+  currentOrder: null,
+  allUsersOrders: [],
   ordersCount: { cash: 0, installment: 0, total: 0, today: 0 },
   ordersPagination: { currentPage: 1, limit: 10, total: 0, pages: 1 },
   appliedFilters: { payment_method: null, status: null, search: null },
   isLoading: false,
   error: null,
-  isLoadingAll: false, // loading for all-users endpoint
+  isLoadingAll: false,
   errorAll: null,
 
   // ---------- Actions ----------
@@ -20,27 +20,12 @@ const useOrderStore = create((set, get) => ({
   // ------------------------------------------------------------
   // 1. SUBMIT ORDER (after successful payment)
   // Endpoint: POST /order/submit
-  // Required: product_id, machinery_id, payment_method, paid, authority, ref_id, status (optional)
   // ------------------------------------------------------------
   submitOrder: async (orderData) => {
     set({ isLoading: true, error: null });
 
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        set({ isLoading: false, error: "لطفاً وارد حساب کاربری خود شوید" });
-        return { success: false, error: "No token found" };
-      }
-
-      // Validate required fields
-      const required = [
-        "product_id",
-        "machinery_id",
-        "payment_method",
-        "paid",
-        "authority",
-        "ref_id",
-      ];
+      const required = ["product_id", "machinery_id", "payment_method", "paid", "authority", "ref_id"];
       for (const field of required) {
         if (!orderData[field]) {
           set({ isLoading: false, error: `فیلد ${field} الزامی است` });
@@ -48,18 +33,11 @@ const useOrderStore = create((set, get) => ({
         }
       }
 
-      const response = await axios.post(`${BASE_URL}/order/submit`, orderData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      // Backend returns { message, order }
+      const response = await apiClient.post("/order/submit", orderData);
       const { order } = response.data;
 
       set((state) => ({
-        orders: [order, ...state.orders], // add to list
+        orders: [order, ...state.orders],
         currentOrder: order,
         isLoading: false,
         error: null,
@@ -67,39 +45,21 @@ const useOrderStore = create((set, get) => ({
 
       return { success: true, data: order };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || error.message || "خطا در ثبت سفارش";
-
-      set({
-        error: errorMessage,
-        isLoading: false,
-      });
-
-      return { success: false, error: errorMessage };
+      set({ error: error.message, isLoading: false });
+      return { success: false, error: error.message };
     }
   },
 
   // ------------------------------------------------------------
   // 2. FETCH USER ORDERS
-  // Endpoint: GET /order/user-orders   (returns orders with product & machinery details)
+  // Endpoint: GET /order/user-orders
   // ------------------------------------------------------------
   fetchOrders: async () => {
     set({ isLoading: true, error: null });
 
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        set({ isLoading: false, error: "لطفاً وارد حساب کاربری خود شوید" });
-        return { success: false, error: "No token found" };
-      }
+      const response = await apiClient.get("/order/user-orders");
 
-      const response = await axios.get(`${BASE_URL}/order/user-orders`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Backend returns { orders: [...] } with full details including product & machinery
       set({
         orders: response.data.orders || [],
         isLoading: false,
@@ -108,35 +68,22 @@ const useOrderStore = create((set, get) => ({
 
       return { success: true, data: response.data.orders };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "خطا در دریافت سفارش‌ها";
-
-      set({
-        error: errorMessage,
-        isLoading: false,
-      });
-
-      return { success: false, error: errorMessage };
+      set({ error: error.message, isLoading: false });
+      return { success: false, error: error.message };
     }
   },
 
+  // ------------------------------------------------------------
   // 3. FETCH ALL USERS ORDERS (admin)
+  // ------------------------------------------------------------
   fetchAllUsersOrders: async ({ query = "", page = 1, limit = 10, payment_method, status } = {}) => {
     set({ isLoadingAll: true, errorAll: null });
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("لطفاً وارد حساب کاربری خود شوید");
-
       const params = { query: query || undefined, page, limit };
       if (payment_method) params.payment_method = payment_method;
       if (status) params.status = status;
 
-      const response = await axios.get(`${BASE_URL}/order/all-users-orders`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params,
-      });
+      const response = await adminApiClient.get("/order/all-users-orders", { params });
 
       set({
         allUsersOrders: response.data.info || [],
@@ -147,65 +94,39 @@ const useOrderStore = create((set, get) => ({
       });
       return { success: true, data: response.data.info };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "خطا در دریافت اطلاعات همه کاربران";
-      set({ errorAll: errorMessage, isLoadingAll: false });
-      return { success: false, error: errorMessage };
+      set({ errorAll: error.message, isLoadingAll: false });
+      return { success: false, error: error.message };
     }
   },
 
+  // ------------------------------------------------------------
   // 4. CHANGE ORDER PAYMENT METHOD (admin)
+  // ------------------------------------------------------------
   changeOrderPaymentMethod: async (orderId, refreshFn) => {
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("لطفاً وارد حساب کاربری خود شوید");
-
-      await axios.patch(
-        `${BASE_URL}/order/change-payment-method/${orderId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
+      await adminApiClient.patch(`/order/change-payment-method/${orderId}`, {});
       if (typeof refreshFn === "function") refreshFn();
       return { success: true };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "خطا در تغییر روش پرداخت";
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message };
     }
   },
 
+  // ------------------------------------------------------------
   // 5. CHANGE ORDER STATUS (admin)
+  // ------------------------------------------------------------
   changeOrderStatus: async (orderId, status, phone, refreshFn) => {
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("لطفاً وارد حساب کاربری خود شوید");
-
-      await axios.patch(
-        `${BASE_URL}/order/change-status/${orderId}`,
-        { status, phone },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
+      await adminApiClient.patch(`/order/change-status/${orderId}`, { status, phone });
       if (typeof refreshFn === "function") refreshFn();
       return { success: true };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "خطا در تغییر وضعیت سفارش";
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message };
     }
   },
 
-  // 6. UTILITY: clear error
   clearError: () => set({ error: null, errorAll: null }),
 
-  // 7. RESET STORE (e.g., on logout)
   reset: () =>
     set({
       orders: [],

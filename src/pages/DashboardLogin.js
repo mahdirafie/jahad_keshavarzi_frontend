@@ -1,42 +1,47 @@
-// pages/LoginPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
 import backgroundImage from "../assets/images/background.jpg";
-import apiClient from "../common/apiClient";
+import useDashboardStore from "../stores/dashboardStore";
 import useCustomSnackbar from "../hooks/useSnackBar";
 
-export default function LoginPage() {
+const validateNationalCode = (code) => {
+  if (!/^\d{10}$/.test(code)) return false;
+  const check = parseInt(code[9]);
+  const sum = code
+    .split("")
+    .slice(0, 9)
+    .reduce((acc, digit, index) => acc + parseInt(digit) * (10 - index), 0);
+  const remainder = sum % 11;
+  return (
+    (remainder < 2 && check === remainder) ||
+    (remainder >= 2 && check === 11 - remainder)
+  );
+};
+
+export default function DashboardLoginPage() {
   const navigate = useNavigate();
   const { showSnackbar } = useCustomSnackbar();
+  const { login, isLoading } = useDashboardStore();
 
-  const [formData, setFormData] = useState({
-    national_code: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ national_code: "", password: "" });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const validateNationalCode = (code) => {
-    if (!/^\d{10}$/.test(code)) return false;
-    const check = parseInt(code[9]);
-    const sum = code
-      .split("")
-      .slice(0, 9)
-      .reduce((acc, digit, index) => acc + parseInt(digit) * (10 - index), 0);
-    const remainder = sum % 11;
-    return (
-      (remainder < 2 && check === remainder) ||
-      (remainder >= 2 && check === 11 - remainder)
-    );
-  };
-
-  const validatePassword = (password) => {
-    if (!password) return "رمز عبور الزامی است";
-    return ""; // no error
+  const validateField = (field, value) => {
+    let error = "";
+    if (field === "national_code") {
+      if (!value) error = "کد ملی الزامی است";
+      else if (!/^\d{10}$/.test(value)) error = "کد ملی باید ۱۰ رقم باشد";
+      else if (!validateNationalCode(value)) error = "کد ملی نامعتبر است";
+    }
+    if (field === "password") {
+      if (!value) error = "رمز عبور الزامی است";
+    }
+    setErrors((prev) => ({ ...prev, [field]: error }));
+    return error === "";
   };
 
   const handleChange = (e) => {
@@ -50,70 +55,30 @@ export default function LoginPage() {
     validateField(field, formData[field]);
   };
 
-  const validateField = (field, value) => {
-    let error = "";
-    switch (field) {
-      case "national_code":
-        if (!value) error = "کد ملی الزامی است";
-        else if (!/^\d{10}$/.test(value)) error = "کد ملی باید ۱۰ رقم باشد";
-        else if (!validateNationalCode(value)) error = "کد ملی نامعتبر است";
-        break;
-      case "password":
-        const passwordError = validatePassword(value);
-        error = passwordError;
-        break;
-      default:
-        break;
-    }
-    setErrors((prev) => ({ ...prev, [field]: error }));
-    return error === "";
-  };
-
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.national_code) newErrors.national_code = "کد ملی الزامی است";
-    else if (!/^\d{10}$/.test(formData.national_code))
-      newErrors.national_code = "کد ملی باید ۱۰ رقم باشد";
-    else if (!validateNationalCode(formData.national_code))
-      newErrors.national_code = "کد ملی نامعتبر است";
-
-    if (!formData.password) newErrors.password = "رمز عبور الزامی است";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const ncOk = validateField("national_code", formData.national_code);
+    const pwOk = validateField("password", formData.password);
+    return ncOk && pwOk;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setTouched({ national_code: true, password: true });
-
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
+    const result = await login(formData.national_code, formData.password);
 
-    try {
-      const { data } = await apiClient.post("/user/login", {
-        national_code: formData.national_code,
-        password: formData.password,
-      });
-
-      showSnackbar("ورود با موفقیت انجام شد!", "success");
-
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
-      }
-
-      navigate('/home');
-    } catch (error) {
-      showSnackbar(error.message, "error");
-    } finally {
-      setIsSubmitting(false);
+    if (result.success) {
+      showSnackbar("ورود به داشبورد با موفقیت انجام شد!", "success");
+      navigate("/dashboard/userorders");
+    } else {
+      showSnackbar(result.error, "error");
     }
   };
 
   return (
     <div className="min-vh-100 position-relative overflow-hidden">
-      {/* Background with blur and overlay */}
+      {/* Background */}
       <div
         className="position-absolute top-0 start-0 w-100 h-100"
         style={{
@@ -125,18 +90,15 @@ export default function LoginPage() {
           zIndex: -2,
         }}
       />
-
-      {/* Dark overlay */}
       <div
         className="position-absolute top-0 start-0 w-100 h-100"
         style={{
           background:
-            "linear-gradient(135deg, rgba(67, 67, 67, 0.8), rgba(0, 0, 0, 0.85))",
+            "linear-gradient(135deg, rgba(20, 50, 20, 0.85), rgba(0, 0, 0, 0.9))",
           zIndex: -1,
         }}
       />
 
-      {/* Main content */}
       <div className="container min-vh-100 d-flex align-items-center justify-content-center py-5">
         <div
           className="col-12 col-md-8 col-lg-5"
@@ -149,7 +111,7 @@ export default function LoginPage() {
           <div
             className="card border-0 shadow-lg"
             style={{
-              background: "rgba(255, 255, 255, 0.95)",
+              background: "rgba(255, 255, 255, 0.97)",
               backdropFilter: "blur(10px)",
               borderRadius: "20px",
               overflow: "hidden",
@@ -158,27 +120,33 @@ export default function LoginPage() {
             <div className="card-body p-4 p-md-5">
               {/* Header */}
               <div className="text-center mb-4">
-                <h1
-                  className="fw-bold mb-2"
+                <div
+                  className="d-inline-flex align-items-center justify-content-center mb-3"
                   style={{
-                    fontSize: "2rem",
-                    color: "#2c3e50",
-                    opacity: 0,
-                    transform: "translateY(20px)",
-                    animation: "fadeInUp 0.6s ease-out 0.2s forwards",
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "16px",
+                    background: "linear-gradient(135deg, #66bb6a 0%, #388e3c 100%)",
+                    animation: "fadeInUp 0.6s ease-out 0.1s both",
                   }}
                 >
-                  ورود به حساب کاربری
+                  <MdDashboard style={{ fontSize: "2rem", color: "#fff" }} />
+                </div>
+                <h1
+                  className="fw-bold mb-1"
+                  style={{
+                    fontSize: "1.75rem",
+                    color: "#2c3e50",
+                    animation: "fadeInUp 0.6s ease-out 0.2s both",
+                  }}
+                >
+                  ورود به داشبورد
                 </h1>
                 <p
-                  className="text-muted"
-                  style={{
-                    opacity: 0,
-                    transform: "translateY(20px)",
-                    animation: "fadeInUp 0.6s ease-out 0.4s forwards",
-                  }}
+                  className="text-muted small"
+                  style={{ animation: "fadeInUp 0.6s ease-out 0.3s both" }}
                 >
-                  لطفاً کد ملی و رمز عبور خود را وارد کنید
+                  سامانه پایش سوخت ویدا
                 </p>
               </div>
 
@@ -186,11 +154,7 @@ export default function LoginPage() {
                 {/* National Code */}
                 <div
                   className="mb-4"
-                  style={{
-                    opacity: 0,
-                    transform: "translateY(20px)",
-                    animation: "fadeInUp 0.6s ease-out 0.3s forwards",
-                  }}
+                  style={{ animation: "fadeInUp 0.6s ease-out 0.35s both" }}
                 >
                   <label
                     htmlFor="national_code"
@@ -212,7 +176,7 @@ export default function LoginPage() {
                     value={formData.national_code}
                     onChange={handleChange}
                     onBlur={() => handleBlur("national_code")}
-                    placeholder="کد ملی خود را وارد کنید"
+                    placeholder="کد ملی ۱۰ رقمی"
                     maxLength="10"
                     style={{
                       borderRadius: "12px",
@@ -227,14 +191,10 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* Password with eye icon */}
+                {/* Password */}
                 <div
                   className="mb-4"
-                  style={{
-                    opacity: 0,
-                    transform: "translateY(20px)",
-                    animation: "fadeInUp 0.6s ease-out 0.4s forwards",
-                  }}
+                  style={{ animation: "fadeInUp 0.6s ease-out 0.4s both" }}
                 >
                   <label
                     htmlFor="password"
@@ -242,8 +202,6 @@ export default function LoginPage() {
                   >
                     رمز عبور <span className="text-danger">*</span>
                   </label>
-
-                  {/* Wrap input + icon in a relative container */}
                   <div className="position-relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -282,47 +240,19 @@ export default function LoginPage() {
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </span>
                   </div>
-
-                  {/* Error message outside the relative container */}
                   {touched.password && errors.password && (
                     <div className="text-danger small mt-2">
                       ⚠️ {errors.password}
                     </div>
                   )}
                 </div>
-                {/* Forgot Password Link */}
-              <div
-                className="d-flex justify-content-start mb-2"
-                style={{
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: "fadeInUp 0.6s ease-out 0.45s forwards",
-                }}
-              >
-                <span
-                  onClick={() => navigate("/forgot-password")}
-                  className="text-decoration-none fw-semibold"
-                  style={{
-                    color: "#489d4c",
-                    cursor: "pointer",
-                  }}
-                >
-                  رمز عبور را فراموش کرده‌اید؟
-                </span>
-              </div>
 
                 {/* Submit */}
-                <div
-                  style={{
-                    opacity: 0,
-                    transform: "translateY(20px)",
-                    animation: "fadeInUp 0.6s ease-out 0.5s forwards",
-                  }}
-                >
+                <div style={{ animation: "fadeInUp 0.6s ease-out 0.5s both" }}>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="btn btn-lg w-100 text-white fw-semibold position-relative overflow-hidden"
+                    disabled={isLoading}
+                    className="btn btn-lg w-100 text-white fw-semibold"
                     style={{
                       background:
                         "linear-gradient(135deg, #66bb6a 0%, #388e3c 100%)",
@@ -331,79 +261,47 @@ export default function LoginPage() {
                       padding: "14px",
                       fontSize: "1.1rem",
                       transition: "all 0.3s ease",
-                      transform: "translateY(0)",
                       boxShadow: "0 4px 15px rgba(102, 187, 106, 0.4)",
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSubmitting) {
-                        e.target.style.transform = "translateY(-2px)";
-                        e.target.style.boxShadow =
+                      if (!isLoading) {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow =
                           "0 6px 20px rgba(56, 142, 60, 0.6)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.transform = "translateY(0)";
-                      e.target.style.boxShadow =
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow =
                         "0 4px 15px rgba(102, 187, 106, 0.4)";
                     }}
                   >
-                    {isSubmitting ? (
+                    {isLoading ? (
                       <>
                         <span
                           className="spinner-border spinner-border-sm me-2"
                           role="status"
                           aria-hidden="true"
-                        ></span>
+                        />
                         در حال ورود...
                       </>
                     ) : (
-                      "ورود"
+                      "ورود به داشبورد"
                     )}
                   </button>
                 </div>
               </form>
-
-              <p
-                className="text-center text-muted mt-4 mb-0 small"
-                style={{
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: "fadeInUp 0.6s ease-out 0.6s forwards",
-                }}
-              >
-                حساب کاربری ندارید؟{" "}
-                <span
-                  onClick={() => navigate("/signup")}
-                  className="text-decoration-none fw-semibold"
-                  style={{
-                    color: "#489d4c",
-                    cursor: "pointer",
-                    display: "inline",
-                  }}
-                >
-                  ثبت‌نام کنید
-                </span>
-              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Inline CSS for animations */}
-      <style>
-        {`
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

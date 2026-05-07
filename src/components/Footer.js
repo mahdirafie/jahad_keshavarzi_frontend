@@ -65,10 +65,16 @@ export default function Footer() {
                 <h4>تماس با ما</h4>
                 <Divider color="white" />
                 <Rxw className={"w-100 justify-content-between"}>
-                  <p>نمایندگی مرکزی:</p>
+                  <p>کارخانه:</p>
                   <p style={{ fontSize: 12 }}>
                     کیلومتر 5 جاده خمین ، پارک علم و فناوری ، ساختمان نواوران ،
                     طبقه دوم ، اتاق 212
+                  </p>
+                </Rxw>
+                <Rxw className={"w-100 justify-content-between"}>
+                  <p>دفتر مرکزی:</p>
+                  <p style={{ fontSize: 12 }}>
+                  اراک، بلوار سردشت، کوچه فهیم، روبه روی نمایندگی تراکتور ولی يی
                   </p>
                 </Rxw>
                 <Rxw className={"w-100 justify-content-between"}>

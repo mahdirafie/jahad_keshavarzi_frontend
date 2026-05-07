@@ -1,0 +1,260 @@
+/* ─── Dashboard Layout ─── */
+:root {
+  --dl-bg: #0d1117;
+  --dl-surface: #161b22;
+  --dl-border: #21262d;
+  --dl-border-2: #30363d;
+  --dl-text: #c9d1d9;
+  --dl-text-bright: #f0f6fc;
+  --dl-text-muted: #7d8590;
+  --dl-green: #3fb950;
+  --dl-green-dim: rgba(63, 185, 80, 0.12);
+  --dl-sidebar-w: 260px;
+  --dl-topbar-h: 56px;
+}
+
+.dl-root {
+  min-height: 100vh;
+  background: var(--dl-bg);
+  color: var(--dl-text);
+  font-family: inherit;
+  direction: rtl;
+  position: relative;
+}
+
+/* ─── Overlay ─── */
+.dl-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 299;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.dl-overlay.dl-overlay-visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ─── Sidebar / Drawer ─── */
+.dl-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--dl-sidebar-w);
+  height: 100vh;
+  background: var(--dl-surface);
+  border-left: 1px solid var(--dl-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 300;
+  /* hidden off-screen to the right */
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  /* drawer itself does NOT scroll — it sticks to the viewport */
+  overflow: hidden;
+  box-shadow: -6px 0 32px rgba(0, 0, 0, 0.6);
+}
+
+.dl-sidebar.dl-sidebar-open {
+  transform: translateX(0);
+}
+
+/* ─── Sidebar top: logo + close button ─── */
+.dl-sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--dl-border);
+  flex-shrink: 0;
+}
+
+.dl-logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.dl-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--dl-text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 6px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+
+.dl-close-btn:hover {
+  color: var(--dl-text-bright);
+  background: var(--dl-border);
+}
+
+/* ─── Admin info block ─── */
+.dl-admin-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  margin: 0.75rem;
+  background: var(--dl-bg);
+  border: 1px solid var(--dl-border);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.dl-admin-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--dl-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: var(--dl-text-muted);
+  flex-shrink: 0;
+}
+
+.dl-admin-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dl-text-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dl-admin-role {
+  font-size: 0.72rem;
+  color: var(--dl-green);
+  margin-top: 0.1rem;
+}
+
+/* ─── Nav ─── */
+.dl-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  gap: 0.25rem;
+  /* allow nav items to scroll if there are many, while the sidebar frame stays fixed */
+  overflow-y: auto;
+}
+
+.dl-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  color: var(--dl-text-muted);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dl-nav-item i {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.dl-nav-item:hover {
+  background: var(--dl-border);
+  color: var(--dl-text-bright);
+  text-decoration: none;
+}
+
+.dl-nav-active {
+  background: var(--dl-green-dim) !important;
+  color: var(--dl-green) !important;
+}
+
+/* ─── Logout ─── */
+.dl-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1.5rem;
+  margin: 0 0.75rem 1.25rem;
+  border: 1px solid var(--dl-border);
+  border-radius: 8px;
+  background: none;
+  color: var(--dl-text-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.dl-logout-btn i {
+  font-size: 1.05rem;
+}
+
+.dl-logout-btn:hover {
+  background: rgba(248, 81, 73, 0.1);
+  color: #f85149;
+  border-color: rgba(248, 81, 73, 0.3);
+}
+
+/* ─── Main content ─── */
+.dl-main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Top bar (always visible — contains hamburger) ─── */
+.dl-topbar {
+  display: flex;
+  align-items: center;
+  height: var(--dl-topbar-h);
+  padding: 0 1rem;
+  background: var(--dl-surface);
+  border-bottom: 1px solid var(--dl-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dl-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--dl-border);
+  color: var(--dl-text);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.25rem 0.45rem;
+  border-radius: 8px;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dl-hamburger:hover {
+  background: var(--dl-border);
+  border-color: var(--dl-border-2);
+}
+
+.dl-content {
+  flex: 1;
+}
+
+/* ─── Responsive tweaks ─── */
+@media (max-width: 480px) {
+  :root {
+    --dl-sidebar-w: 80vw;
+  }
+}

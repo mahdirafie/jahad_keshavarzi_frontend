@@ -1,7 +1,7 @@
 // pages/SignUpPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BASE_URL from "../common/baseUrl";
+import apiClient from "../common/apiClient";
 import useCustomSnackbar from "../hooks/useSnackBar";
 import backgroundImage from "../assets/images/background.jpg";
 
@@ -141,30 +141,20 @@ export default function SignUpPage() {
     setIsSubmitting(true);
 
     try {
-      // Call OTP API
-      const response = await fetch(`${BASE_URL}/otp/send_otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: formData.phone, national_code: formData.national_code }),
+      await apiClient.post("/otp/send_otp", {
+        phone: formData.phone,
+        national_code: formData.national_code,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "خطایی رخ داده است");
-      }
-
-      // Navigate to OTP page with phone number and user data
-      navigate("/otp", { 
-        state: { 
+      navigate("/otp", {
+        state: {
           phone: formData.phone,
-          userData: formData 
-        } 
+          userData: formData,
+        },
       });
 
       showSnackbar("ارسال کد انجام شد!", "success");
     } catch (error) {
-      console.error("Failed to send OTP:", error);
       showSnackbar(error.message || "ارسال کد OTP موفقیت‌آمیز نبود", "error");
     } finally {
       setIsSubmitting(false);

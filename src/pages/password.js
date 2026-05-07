@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import backgroundImage from "../assets/images/background.jpg";
-import BASE_URL from "../common/baseUrl";
+import apiClient from "../common/apiClient";
 import useCustomSnackbar from "../hooks/useSnackBar";
 
 export default function PasswordPage() {
@@ -118,47 +118,20 @@ export default function PasswordPage() {
     setIsSubmitting(true);
 
     try {
-      // Prepare the request body according to API requirements
-      const requestBody = {
+      await apiClient.post("/user/create", {
         national_code: userData.national_code,
         name: userData.fullname,
         phone: userData.phone,
-        password: formData.password
-      };
-
-      // Call the user creation API
-      const response = await fetch(`${BASE_URL}/user/create`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
+        password: formData.password,
       });
 
-      const data = await response.json();
+      showSnackbar("حساب کاربری با موفقیت ایجاد شد!", "success");
 
-      if (response.ok) {
-        showSnackbar("حساب کاربری با موفقیت ایجاد شد!", "success");
-        
-        // Reset form
-        setFormData({ password: "", confirmPassword: "" });
-        setTouched({});
-        
-        // Navigate to dashboard on successful user creation
-        navigate('/login');
-        
-      } else {
-        // Handle different error cases
-        if (response.status === 409) {
-          throw new Error("کاربر با این کد ملی یا شماره موبایل قبلاً ثبت‌نام کرده است");
-        } else if (response.status === 400) {
-          throw new Error(data.message || "اطلاعات ارسالی نامعتبر است");
-        } else {
-          throw new Error(data.message || "خطا در ایجاد حساب کاربری");
-        }
-      }
+      setFormData({ password: "", confirmPassword: "" });
+      setTouched({});
+
+      navigate('/login');
     } catch (error) {
-      console.error("User creation error:", error);
       showSnackbar(error.message, "error");
     } finally {
       setIsSubmitting(false);

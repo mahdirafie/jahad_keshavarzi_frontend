@@ -48,7 +48,7 @@ const MachineryPage = () => {
     createMachine,
     deleteMachine,
   } = useMachineryStore();
-  const { user } = useAuthStore();
+  const { user, checkProfileCompletion } = useAuthStore();
   const { requestPayment, isLoading: isPaymentLoading } = usePaymentStore();
   const { createReservation, isLoading: isReservationLoading } =
     useReservationStore();
@@ -74,7 +74,16 @@ const MachineryPage = () => {
 
   // ---------- Effects ----------
   useEffect(() => {
-    fetchMachines();
+    const init = async () => {
+      const result = await checkProfileCompletion();
+      if (!result.is_complete) {
+        showSnackbar("پروفایل شما ناقص است. در حال انتقال به صفحه تکمیل پروفایل...", "warning");
+        setTimeout(() => navigate("/complete-profile"), 3000);
+        return;
+      }
+      fetchMachines();
+    };
+    init();
     setupIntersectionObserver();
     return () => observerRef.current?.disconnect();
   }, []);
@@ -274,7 +283,7 @@ const MachineryPage = () => {
         return;
       }
 
-      const authority = paymentResult.authority; // or paymentResult.data.authority
+      const authority = paymentResult.authority;
 
       // Step 2: Create a reservation for every machine with the same authority
       const reservationPromises = machines.map((machine) =>
@@ -320,10 +329,10 @@ const MachineryPage = () => {
       localStorage.setItem("lastAuthority", authority);
 
       // Step 3: Redirect to Zarinpal payment page
-      const gatewayBaseUrl = "https://payment.zarinpal.com/pg/StartPay/"
-//        process.env.NODE_ENV === "production"
-//          ? "https://zarinpal.com/pg/StartPay/"
-//          : "https://sandbox.zarinpal.com/pg/StartPay/";
+      const gatewayBaseUrl = 
+       process.env.REACT_APP_TYPE === "debuging"
+         ? "https://sandbox.zarinpal.com/pg/StartPay/"
+         : "https://payment.zarinpal.com/pg/StartPay/";
       window.location.href = `${gatewayBaseUrl}${authority}`;
     } catch (error) {
       showSnackbar("خطا در فرآیند سفارش", "error");

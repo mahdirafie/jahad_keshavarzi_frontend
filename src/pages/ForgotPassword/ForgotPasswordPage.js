@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/images/background.jpg";
-import BASE_URL from "../../common/baseUrl";
+import apiClient from "../../common/apiClient";
 import useCustomSnackbar from "../../hooks/useSnackBar";
 
 export default function ForgotPasswordPage() {
@@ -56,20 +56,10 @@ export default function ForgotPasswordPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${BASE_URL}/otp/reset-password-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ national_code: nationalCode }),
-      });
+      await apiClient.post("/otp/reset-password-otp", { national_code: nationalCode });
 
-      const data = await response.json();
-      if (response.ok) {
-        showSnackbar("کد تأیید به شماره همراه شما ارسال شد", "success");
-        // Navigate to OTP page with national code
-        navigate("/forgot-otp", { state: { national_code: nationalCode } });
-      } else {
-        throw new Error(data.message || "خطا در ارسال کد");
-      }
+      showSnackbar("کد تأیید به شماره همراه شما ارسال شد", "success");
+      navigate("/forgot-otp", { state: { national_code: nationalCode } });
     } catch (error) {
       showSnackbar(error.message, "error");
     } finally {

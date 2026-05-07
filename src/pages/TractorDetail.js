@@ -19,7 +19,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useParams } from "react-router-dom";
-import BASE_URL from "../common/baseUrl";
+import apiClient from "../common/apiClient";
 
 // Fix for default marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -51,22 +51,11 @@ export default function TractorDetailPage() {
   const fetchTractorLogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${BASE_URL}/tractor_log/get_all?time_range=${timeRange}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ tractor_id: tractorId }),
-        }
+      const { data } = await apiClient.post(
+        `/tractor_log/get_all?time_range=${timeRange}`,
+        { tractor_id: tractorId }
       );
 
-      if (!response.ok) {
-        throw new Error("خطا در دریافت اطلاعات");
-      }
-
-      const data = await response.json();
       setTractor(data.tractor);
       setLogs(data.logs || []);
       setError(null);

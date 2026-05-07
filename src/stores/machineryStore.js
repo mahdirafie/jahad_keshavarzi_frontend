@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
-import BASE_URL from '../common/baseUrl';
+import apiClient from '../common/apiClient';
 
 const useMachineryStore = create((set, get) => ({
   // State
@@ -10,46 +9,26 @@ const useMachineryStore = create((set, get) => ({
   error: null,
 
   // ------------------------------------------------------------
-  // Fetch all machines of the logged‑in user
+  // Fetch all machines of the logged-in user
   // Endpoint: GET /agricultural_machinery/machines
   // ------------------------------------------------------------
   fetchMachines: async () => {
     set({ isLoading: true, error: null });
 
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        set({ isLoading: false, error: 'لطفاً وارد حساب کاربری خود شوید' });
-        return { success: false, error: 'No token found' };
-      }
+      const response = await apiClient.get('/agricultural_machinery/machines');
 
-      const response = await axios.get(`${BASE_URL}/agricultural_machinery/machines`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Backend returns { message, machines: [...] }
       set({
         machines: response.data.machines || [],
-        product: response.data.product || null, 
+        product: response.data.product || null,
         isLoading: false,
         error: null,
       });
 
       return { success: true, data: response.data.machines };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'خطا در دریافت اطلاعات ماشین‌آلات';
-
-      set({
-        error: errorMessage,
-        isLoading: false,
-      });
-
-      return { success: false, error: errorMessage };
+      set({ error: error.message, isLoading: false });
+      return { success: false, error: error.message };
     }
   },
 
@@ -62,19 +41,12 @@ const useMachineryStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        set({ isLoading: false, error: 'لطفاً وارد حساب کاربری خود شوید' });
-        return { success: false, error: 'No token found' };
-      }
-
-      // Determine endpoint and build payload
-      let endpoint;
       const payload = {
         manufacture_year: machineData.manufacture_year,
         model: machineData.model,
       };
 
+      let endpoint;
       switch (type) {
         case 'tractor':
           endpoint = '/agricultural_machinery/create-tractor';
@@ -92,15 +64,8 @@ const useMachineryStore = create((set, get) => ({
           throw new Error('Invalid machine type');
       }
 
-      const response = await axios.post(`${BASE_URL}${endpoint}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiClient.post(endpoint, payload);
 
-      // Construct the full machine object exactly as the GET endpoint returns it
-      // Response contains: { agricultural_machinery, tractor/combine/chopper }
       const newMachine = {
         ...response.data.agricultural_machinery,
         tractor: response.data.tractor || null,
@@ -108,7 +73,6 @@ const useMachineryStore = create((set, get) => ({
         chopper: response.data.chopper || null,
       };
 
-      // Optimistically add the new machine to the store
       set((state) => ({
         machines: [newMachine, ...state.machines],
         isLoading: false,
@@ -117,17 +81,8 @@ const useMachineryStore = create((set, get) => ({
 
       return { success: true, data: newMachine };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'خطا در ایجاد ماشین';
-
-      set({
-        error: errorMessage,
-        isLoading: false,
-      });
-
-      return { success: false, error: errorMessage };
+      set({ error: error.message, isLoading: false });
+      return { success: false, error: error.message };
     }
   },
 
@@ -139,19 +94,8 @@ const useMachineryStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        set({ isLoading: false, error: 'لطفاً وارد حساب کاربری خود شوید' });
-        return { success: false, error: 'No token found' };
-      }
+      await apiClient.delete(`/agricultural_machinery/${machineId}`);
 
-      await axios.delete(`${BASE_URL}/agricultural_machinery/${machineId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Remove the machine from the store
       set((state) => ({
         machines: state.machines.filter((m) => m.id !== machineId),
         isLoading: false,
@@ -160,28 +104,13 @@ const useMachineryStore = create((set, get) => ({
 
       return { success: true };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'خطا در حذف ماشین';
-
-      set({
-        error: errorMessage,
-        isLoading: false,
-      });
-
-      return { success: false, error: errorMessage };
+      set({ error: error.message, isLoading: false });
+      return { success: false, error: error.message };
     }
   },
 
-  // ------------------------------------------------------------
-  // Utility: clear any stored error
-  // ------------------------------------------------------------
   clearError: () => set({ error: null }),
 
-  // ------------------------------------------------------------
-  // Reset the store (useful for logout)
-  // ------------------------------------------------------------
   reset: () =>
     set({
       machines: [],

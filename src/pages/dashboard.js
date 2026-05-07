@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Table, Badge, Spinner, Button } from "react-bootstrap";
 import { IoLogOut, IoGrid, IoMenu, IoClose } from "react-icons/io5";
-import BASE_URL from "../common/baseUrl";
+import apiClient from "../common/apiClient";
 import Map from "../components/Map";
 import "./dashboard.css";
 
@@ -27,9 +27,7 @@ export default function DashboardPage({ onLogout }) {
   const fetchTractorData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${BASE_URL}/tractor/info_all`);
-      if (!res.ok) throw new Error("خطا در دریافت اطلاعات");
-      const data = await res.json();
+      const { data } = await apiClient.get("/tractor/info_all");
       setTractors(data.tractors ?? []);
       setCities(data.cities ?? {});
     } catch (err) {

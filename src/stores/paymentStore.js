@@ -1,6 +1,5 @@
 import { create } from "zustand";
-import axios from "axios";
-import BASE_URL from "../common/baseUrl";
+import apiClient from "../common/apiClient";
 
 const usePaymentStore = create((set, get) => ({
   // State
@@ -14,15 +13,7 @@ const usePaymentStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}/payment/request`,
-        orderData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await apiClient.post("/payment/request", orderData);
 
       set({
         paymentData: response.data.data,
@@ -30,26 +21,14 @@ const usePaymentStore = create((set, get) => ({
         error: null,
       });
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         data: response.data.data,
-        authority: response.data.data.authority // For easy access
+        authority: response.data.data.authority,
       };
-
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.errors?.join(", ") ||
-        error.message ||
-        "Failed to request payment";
-
-      set({
-        error: errorMessage,
-        isLoading: false,
-        paymentData: null,
-      });
-
-      return { success: false, error: errorMessage };
+      set({ error: error.message, isLoading: false, paymentData: null });
+      return { success: false, error: error.message };
     }
   },
 
@@ -57,25 +36,11 @@ const usePaymentStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}/payment/verify`,
-        { authority, amount },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      const response = await apiClient.post("/payment/verify", { authority, amount });
       const verificationData = response.data.data;
-      
-      set({
-        verificationData,
-        isLoading: false,
-        error: null,
-      });
 
-      // Handle different response codes based on documentation
+      set({ verificationData, isLoading: false, error: null });
+
       let success = false;
       let message = verificationData.message;
 
@@ -90,28 +55,17 @@ const usePaymentStore = create((set, get) => ({
         message = verificationData.message || "خطا در تأیید تراکنش";
       }
 
-      return { 
-        success, 
+      return {
+        success,
         data: verificationData,
         code: verificationData.code,
         message,
         refId: verificationData.ref_id,
-        cardPan: verificationData.card_pan
+        cardPan: verificationData.card_pan,
       };
-
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.errors?.join(", ") ||
-        error.message ||
-        "Failed to verify payment";
-
-      set({
-        error: errorMessage,
-        isLoading: false,
-      });
-
-      return { success: false, error: errorMessage };
+      set({ error: error.message, isLoading: false });
+      return { success: false, error: error.message };
     }
   },
 

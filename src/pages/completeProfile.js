@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import useCustomSnackbar from "../hooks/useSnackBar";
 import "./completeProfile.css";
+import apiClient from "../common/apiClient";
 import BASE_URL from "../common/baseUrl";
 
 const CompleteProfile = () => {
@@ -10,8 +11,6 @@ const CompleteProfile = () => {
   const { completeProfile, getProfile, isLoading, error } = useAuthStore();
   const { showSnackbar } = useCustomSnackbar();
 
-  const backendUrl = 'http://localhost:4000';
-  // const backendUrl = 'https://peymash.ir/api';
 
   const markaziCities = [
     "اراک",
@@ -112,8 +111,7 @@ const CompleteProfile = () => {
 
         // Set image preview - add cache busting
         if (existingData.profile_image) {
-          const baseUrl =
-            BASE_URL || backendUrl;
+          const baseUrl = BASE_URL;
           const imagePath = existingData.profile_image;
 
           // console.log("Setting image preview from profile data:");
@@ -169,8 +167,6 @@ const CompleteProfile = () => {
       const formDataToSend = new FormData();
       formDataToSend.append("profile_image", file);
 
-      const token = localStorage.getItem("authToken") || "";
-
       // console.log("=== STARTING FILE UPLOAD ===");
       // console.log(
       //   "API URL:",
@@ -188,49 +184,19 @@ const CompleteProfile = () => {
       //   type: file.type,
       // });
 
-      const response = await fetch(
-        `${
-          BASE_URL || backendUrl
-        }/user/upload-profile-image`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formDataToSend,
-        }
+      const { data } = await apiClient.post(
+        "/user/upload-profile-image",
+        formDataToSend
       );
 
-      // console.log("Upload response status:", response.status);
-      // console.log(
-      //   "Response headers:",
-      //   Object.fromEntries(response.headers.entries())
-      // );
-
-      // Check if response is JSON
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        const text = await response.text();
-        console.error("Non-JSON response:", text);
-        throw new Error(
-          `Server returned ${response.status}: ${text.substring(0, 100)}`
-        );
-      }
-
-      const data = await response.json();
-
-      // console.log("Upload response data:", data);
-
-      if (response.ok && data.success) {
+      if (data.success) {
         const imagePath = data.profile_image;
         // console.log("Received image path from backend:", imagePath);
 
         // Update form data
         setFormData((prev) => ({ ...prev, profile_image: imagePath }));
 
-        // Update preview with cache busting - FIXED VERSION
-        const baseUrl =
-          BASE_URL || backendUrl;
+        const baseUrl = BASE_URL;
         let newImageUrl;
 
         if (imagePath.startsWith("http")) {
@@ -371,36 +337,9 @@ const CompleteProfile = () => {
 
   const handleRemoveImage = async () => {
     try {
-      const token = localStorage.getItem("authToken") || "";
+      const { data } = await apiClient.delete("/user/delete-profile-image");
 
-      const response = await fetch(
-        `${
-          BASE_URL || backendUrl
-        }/user/delete-profile-image`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // console.log("Delete response status:", response.status);
-
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        const text = await response.text();
-        console.error("Non-JSON delete response:", text);
-        throw new Error(
-          `Server returned ${response.status}: ${text.substring(0, 100)}`
-        );
-      }
-
-      const data = await response.json();
-      // console.log("Delete response data:", data);
-
-      if (response.ok && data.success) {
+      if (data.success) {
         // Clear local state
         setFormData((prev) => ({ ...prev, profile_image: "" }));
         setImagePreview("");
@@ -784,9 +723,7 @@ const CompleteProfile = () => {
 
                           // Try to fix the URL
                           const currentSrc = e.target.src;
-                          const baseUrl =
-                            BASE_URL ||
-                            backendUrl;
+                          const baseUrl = BASE_URL;
 
                           // Check if we need to add base URL
                           if (

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import backgroundImage from "../assets/images/background.jpg";
-import BASE_URL from "../common/baseUrl";
+import apiClient from "../common/apiClient";
 import useCustomSnackbar from "../hooks/useSnackBar";
 
 export default function OTPPage() {
@@ -93,31 +93,19 @@ export default function OTPPage() {
     const otpCode = otp.join("");
 
     try {
-      // Call OTP verification API
-      const response = await fetch(`${BASE_URL}/otp/verify_otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          phone: phone,
-          code: otpCode 
-        }),
+      await apiClient.post("/otp/verify_otp", {
+        phone: phone,
+        code: otpCode,
       });
 
-      const data = await response.json();
+      showSnackbar("تایید با موفقیت انجام شد!", "success");
 
-      if (response.ok) {
-        showSnackbar("تایید با موفقیت انجام شد!", "success");
-        
-        // Navigate to password page with all user data
-        navigate("/password", { 
-          state: { 
-            ...userData,
-            phone: phone
-          } 
-        });
-      } else {
-        throw new Error(data.message || "کد تایید نامعتبر است");
-      }
+      navigate("/password", {
+        state: {
+          ...userData,
+          phone: phone,
+        },
+      });
     } catch (error) {
       showSnackbar(error.message || "خطا در تایید کد", "error");
     } finally {
@@ -130,23 +118,16 @@ export default function OTPPage() {
     if (!canResend) return;
 
     try {
-      const response = await fetch(`${BASE_URL}/otp/send_otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: phone, national_code: userData.national_code }),
+      await apiClient.post("/otp/send_otp", {
+        phone: phone,
+        national_code: userData.national_code,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setResendTimer(120);
-        setCanResend(false);
-        setOtp(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
-        showSnackbar("کد تایید مجدداً ارسال شد", "success");
-      } else {
-        throw new Error(data.message || "خطا در ارسال مجدد کد");
-      }
+      setResendTimer(120);
+      setCanResend(false);
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+      showSnackbar("کد تایید مجدداً ارسال شد", "success");
     } catch (error) {
       showSnackbar(error.message, "error");
     }
