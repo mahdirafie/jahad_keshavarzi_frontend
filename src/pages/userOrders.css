@@ -1775,3 +1775,77 @@
     border-top: 1px solid #21262d;
     margin-top: 0.25rem;
 }
+
+/* ─── SMS Modal styles ─── */
+.op-sms-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.25rem 0;
+}
+
+.op-sms-phone-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    color: #c9d1d9;
+}
+
+.op-sms-phone-row i {
+    color: #58a6ff;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.op-sms-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.op-sms-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #c9d1d9;
+}
+
+.op-sms-textarea {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    color: #c9d1d9;
+    padding: 0.65rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 110px;
+    transition: border-color 0.2s;
+    direction: rtl;
+}
+
+.op-sms-textarea:focus {
+    outline: none;
+    border-color: #388bfd;
+}
+
+.op-sms-textarea::placeholder {
+    color: #484f58;
+}
+
+.op-sms-char-count {
+    font-size: 0.78rem;
+    color: #484f58;
+    text-align: left;
+}
+
+.op-sms-actions {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+    padding-top: 0.25rem;
+}

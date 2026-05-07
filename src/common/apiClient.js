@@ -14,6 +14,11 @@ apiClient.interceptors.request.use((config) => {
     const token = localStorage.getItem('authToken');
     if (token) config.headers.Authorization = `Bearer ${token}`;
   }
+  // When sending FormData let the browser auto-set Content-Type with the
+  // multipart boundary — the hardcoded JSON default must be removed.
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
   return config;
 });
 

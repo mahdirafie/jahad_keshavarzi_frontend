@@ -10,6 +10,11 @@
 
 /* Header */
 .up-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -24,6 +29,29 @@
   font-size: 0.85rem;
   color: #7d8590;
   margin: 0;
+}
+
+.up-broadcast-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.25rem;
+  background: #1a2a3a;
+  border: 1px solid #388bfd;
+  border-radius: 8px;
+  color: #58a6ff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.up-broadcast-btn:hover {
+  background: rgba(56, 139, 253, 0.15);
+  border-color: #58a6ff;
 }
 
 /* ─── Stat cards ─── */
@@ -297,6 +325,221 @@
   background: rgba(248, 81, 73, 0.1);
 }
 
+/* Table with SMS action column */
+.up-table--actions .up-thead,
+.up-table--actions .up-row {
+  grid-template-columns: 40px 2.5fr 1.4fr 1.4fr 1.3fr 1fr 44px;
+}
+
+/* SMS action column */
+.up-col-sms {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.up-sms-btn {
+  background: none;
+  border: none;
+  color: #7d8590;
+  padding: 0.35rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: color 0.15s, background 0.15s;
+}
+
+.up-sms-btn:hover {
+  color: #58a6ff;
+  background: rgba(56, 139, 253, 0.1);
+}
+
+/* ─── SMS modal form ─── */
+.up-sms-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.up-sms-phone-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  color: #c9d1d9;
+}
+
+.up-sms-phone-row i {
+  color: #58a6ff;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.up-sms-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.up-sms-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c9d1d9;
+}
+
+.up-sms-select {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  color: #c9d1d9;
+  padding: 0.55rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.up-sms-select:focus {
+  outline: none;
+  border-color: #388bfd;
+}
+
+.up-sms-select option {
+  background: #161b22;
+  color: #c9d1d9;
+}
+
+.up-sms-textarea {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  color: #c9d1d9;
+  padding: 0.65rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 110px;
+  transition: border-color 0.2s;
+  direction: rtl;
+}
+
+.up-sms-textarea:focus {
+  outline: none;
+  border-color: #388bfd;
+}
+
+.up-sms-textarea::placeholder {
+  color: #484f58;
+}
+
+.up-sms-char-count {
+  font-size: 0.78rem;
+  color: #484f58;
+  text-align: left;
+}
+
+.up-sms-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: rgba(210, 153, 34, 0.08);
+  border: 1px solid rgba(210, 153, 34, 0.25);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.84rem;
+  color: #d29922;
+  line-height: 1.5;
+}
+
+.up-sms-warning i {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.up-sms-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+}
+
+/* ─── Pagination ─── */
+.up-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 0.25rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.up-page-size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #7d8590;
+}
+
+.up-page-size select {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.up-page-size select option {
+  background: #161b22;
+}
+
+.up-page-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.up-page-nav button {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.up-page-nav button:hover:not(:disabled) {
+  background: #21262d;
+  border-color: #388bfd;
+  color: #58a6ff;
+}
+
+.up-page-nav button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.up-page-num {
+  font-size: 0.85rem;
+  color: #7d8590;
+  min-width: 60px;
+  text-align: center;
+}
+
 /* ─── Modal action bar (pinned to bottom of modal) ─── */
 .up-modal-actions {
   display: flex;
@@ -359,15 +602,17 @@
 
 /* ─── Responsive ─── */
 @media (max-width: 900px) {
-  .up-thead {
-    grid-template-columns: 40px 2fr 1.3fr 1.2fr 1fr;
-  }
+  .up-thead,
   .up-row {
     grid-template-columns: 40px 2fr 1.3fr 1.2fr 1fr;
   }
+  .up-table--actions .up-thead,
+  .up-table--actions .up-row {
+    grid-template-columns: 40px 2fr 1.3fr 1.2fr 1fr 44px;
+  }
   /* Hide date on tablet */
   .up-col-date,
-  .up-thead > *:nth-child(6) {
+  .up-thead > *:nth-child(6):not(:last-child) {
     display: none;
   }
 }
@@ -421,8 +666,32 @@
     font-size: 0.78rem;
   }
 
+  .up-col-sms {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .up-row {
+    position: relative;
+  }
+
   .up-search {
     max-width: 100%;
+  }
+
+  .up-sms-actions {
+    flex-direction: column;
+  }
+
+  .up-sms-actions .up-modal-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .up-broadcast-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 

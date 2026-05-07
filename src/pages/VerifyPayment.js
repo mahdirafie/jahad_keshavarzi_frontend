@@ -157,12 +157,12 @@ const VerifyPayment = () => {
     }
   };
 
-  const handleBackToTractors = () => {
-    navigate("/machines");
-  };
-
   const handleGoToHome = () => {
     navigate("/");
+  };
+
+  const handleGoToOrders = () => {
+    navigate("/", { state: { openOrders: true } });
   };
 
   const getStatusIcon = () => {
@@ -246,14 +246,6 @@ const VerifyPayment = () => {
                 </span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">کارمزد:</span>
-                <span className="detail-value">
-                  {verificationData.fee
-                    ? `${verificationData.fee} تومان`
-                    : "رایگان"}
-                </span>
-              </div>
-              <div className="detail-row">
                 <span className="detail-label">تاریخ و زمان:</span>
                 <span className="detail-value">
                   {new Date().toLocaleString("fa-IR")}
@@ -269,19 +261,9 @@ const VerifyPayment = () => {
           )}
 
           <div className="action-buttons">
-            {verificationStatus === "success" && (
-              <button className="btn-success" onClick={handleBackToTractors}>
-                بازگشت به تراکتورها
-              </button>
-            )}
-
-            {(verificationStatus === "failed" ||
-              verificationStatus === "already_verified") && (
-              <button className="btn-primary" onClick={handleBackToTractors}>
-                بازگشت به تراکتورها
-              </button>
-            )}
-
+            <button className="btn-success" onClick={handleGoToOrders}>
+              مشاهده سفارشات من
+            </button>
             <button className="btn-secondary" onClick={handleGoToHome}>
               بازگشت به صفحه اصلی
             </button>

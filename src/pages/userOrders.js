@@ -1092,6 +1092,7 @@ const UserOrders = () => {
     getAllProducts,
     getUserMachinesWithoutOrder,
     createManualOrder,
+    sendSmsToPhone,
   } = useDashboardStore();
   const isSuperAdmin = String(admin?.role ?? "").toLowerCase() === "superadmin";
   const { showSnackbar } = useCustomSnackbar();
@@ -1543,6 +1544,11 @@ const UserOrders = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const menuRef = useRef(null);
 
+  // ─── SMS modal state ─────────────────────────────────────────────────────────
+  const [smsOrder, setSmsOrder]     = useState(null); // order snapshot
+  const [smsMessage, setSmsMessage] = useState("");
+  const [smsSending, setSmsSending] = useState(false);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -1576,6 +1582,21 @@ const UserOrders = () => {
   }, [filterPaymentMethod, filterStatus]);
 
   useEffect(() => () => clearError(), [clearError]);
+
+  const handleSendSms = async () => {
+    if (!smsOrder || !smsMessage.trim()) return;
+    const phone = smsOrder.user?.phone || "";
+    setSmsSending(true);
+    const result = await sendSmsToPhone(phone, smsMessage.trim());
+    setSmsSending(false);
+    if (result.success) {
+      showSnackbar(result.message || "پیامک با موفقیت ارسال شد.", "success");
+      setSmsOrder(null);
+      setSmsMessage("");
+    } else {
+      showSnackbar(result.error || "خطا در ارسال پیامک", "error");
+    }
+  };
 
   const orders = allUsersOrders || [];
   const totalPages = ordersPagination?.pages ?? 1;
@@ -1804,6 +1825,17 @@ const UserOrders = () => {
                           >
                             <i className="bi bi-pencil-square"></i>
                             تغییر وضعیت سفارش
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSmsOrder(order);
+                              setSmsMessage("");
+                              setOpenMenuId(null);
+                            }}
+                          >
+                            <i className="bi bi-chat-dots"></i>
+                            ارسال پیامک
                           </button>
                         </div>
                       )}
@@ -2324,6 +2356,58 @@ const UserOrders = () => {
               disabled={coSubmitting}
             >
               {coSubmitting ? "در حال ثبت…" : "ثبت سفارش"}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* ─── SMS Modal ─── */}
+      <Modal
+        isOpen={!!smsOrder}
+        onClose={() => { setSmsOrder(null); setSmsMessage(""); }}
+        title={smsOrder ? `ارسال پیامک به ${smsOrder.user?.name || smsOrder.user?.national_code || "کاربر"}` : ""}
+        className="modal-dark"
+      >
+        <div className="op-sms-form" dir="rtl">
+          <div className="op-sms-phone-row">
+            <i className="bi bi-telephone" />
+            <span dir="ltr">{smsOrder?.user?.phone || "—"}</span>
+          </div>
+          <div className="op-sms-field">
+            <label className="op-sms-label">متن پیامک</label>
+            <textarea
+              className="op-sms-textarea"
+              rows={5}
+              placeholder="متن پیامک را وارد کنید..."
+              value={smsMessage}
+              onChange={(e) => setSmsMessage(e.target.value)}
+              maxLength={1000}
+              dir="rtl"
+            />
+            <div className="op-sms-char-count">
+              {smsMessage.length.toLocaleString("fa-IR")} / ۱۰۰۰
+            </div>
+          </div>
+          <div className="op-sms-actions">
+            <button
+              type="button"
+              className="op-status-modal-cancel"
+              onClick={() => { setSmsOrder(null); setSmsMessage(""); }}
+              disabled={smsSending}
+            >
+              انصراف
+            </button>
+            <button
+              type="button"
+              className="op-status-modal-confirm"
+              onClick={handleSendSms}
+              disabled={smsSending || !smsMessage.trim()}
+            >
+              {smsSending ? (
+                <><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" /> در حال ارسال...</>
+              ) : (
+                <><i className="bi bi-send" /> ارسال پیامک</>
+              )}
             </button>
           </div>
         </div>

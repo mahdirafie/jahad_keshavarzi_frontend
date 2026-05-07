@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import useCustomSnackbar from "../hooks/useSnackBar";
@@ -64,6 +64,8 @@ const CompleteProfile = () => {
   const [imagePreview, setImagePreview] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchUserProfile();
@@ -265,7 +267,7 @@ const CompleteProfile = () => {
       } else {
         console.error("Upload failed:", data.message);
         showSnackbar(
-          data.message || `خطا در آپلود تصویر (${response.status})`,
+          data.message || "خطا در آپلود تصویر",
           "error"
         );
 
@@ -333,6 +335,50 @@ const CompleteProfile = () => {
       // Upload file
       handleFileUpload(file);
     }
+  };
+
+  const handleZoneClick = (e) => {
+    if (uploadingImage) return;
+    if (e.target.closest('button') || e.target.closest('label')) return;
+    fileInputRef.current?.click();
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showSnackbar("حجم فایل نباید بیشتر از ۲ مگابایت باشد", "error");
+      return;
+    }
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    if (!allowedTypes.includes(file.type)) {
+      showSnackbar("فقط فایل‌های تصویر (JPEG, PNG, GIF) مجاز هستند", "error");
+      return;
+    }
+    setImagePreview(URL.createObjectURL(file));
+    handleFileUpload(file);
   };
 
   const handleRemoveImage = async () => {
@@ -697,7 +743,14 @@ const CompleteProfile = () => {
             {/* Profile Image */}
             <div className="form-group">
               <label className="form-label">عکس پروفایل</label>
-              <div className="image-upload-section">
+              <div
+                className={`image-upload-section${isDragging ? " dragging" : ""}`}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={handleZoneClick}
+              >
                 {imagePreview ? (
                   <div className="image-preview-container">
                     <div className="image-preview">
@@ -799,6 +852,7 @@ const CompleteProfile = () => {
                   </div>
                 )}
                 <input
+                  ref={fileInputRef}
                   type="file"
                   id="profile_image"
                   name="profile_image"

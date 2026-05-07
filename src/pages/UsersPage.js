@@ -365,16 +365,16 @@ const UserInfoEditForm = ({ draft, onDraftChange }) => {
 
 const SHIMMER_ROWS = 8;
 const SEARCH_DEBOUNCE_MS = 500;
+const DEFAULT_PAGE_SIZE = 20;
 
 export default function UsersPage() {
-  const { admin, getAllUsers, searchUsers, getUserInfo, updateUser } =
-    useDashboardStore();
+  const { admin, listUsers, getUserInfo, updateUser, sendSmsToPhone, sendSmsToUsers } = useDashboardStore();
   const { showSnackbar } = useCustomSnackbar();
 
   const isSuperAdmin = admin?.role === "superadmin";
 
-  // ── List state ──────────────────────────────────────────────────────────────
-  const [users, setUsers] = useState([]);
+  // ── Full list (all results from API) ────────────────────────────────────────
+  const [allUsers, setAllUsers] = useState([]);
   const [totalCount, setTotalCount] = useState(null);
   const [fetching, setFetching] = useState(true);
   const [fetchError, setFetchError] = useState(null);
@@ -384,52 +384,71 @@ export default function UsersPage() {
   const [activeQuery, setActiveQuery] = useState("");
   const debounceRef = useRef(null);
 
+  // ── Pagination ───────────────────────────────────────────────────────────────
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(DEFAULT_PAGE_SIZE);
+
   // ── Modal state ──────────────────────────────────────────────────────────────
-  const [selectedUser, setSelectedUser]   = useState(null); // list-row snapshot
-  const [userDetail, setUserDetail]       = useState(null); // loaded from API
+  const [selectedUser, setSelectedUser]   = useState(null);
+  const [userDetail, setUserDetail]       = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError]     = useState(null);
 
-  const [editMode, setEditMode]       = useState(false);
-  const [formDraft, setFormDraft]     = useState(null);
+  const [editMode, setEditMode]         = useState(false);
+  const [formDraft, setFormDraft]       = useState(null);
   const [editBaseline, setEditBaseline] = useState(null);
-  const [saving, setSaving]           = useState(false);
+  const [saving, setSaving]             = useState(false);
 
-  // ── Fetch helpers ────────────────────────────────────────────────────────────
+  // ── SMS (per-user) ────────────────────────────────────────────────────────────
+  const [smsTarget, setSmsTarget]   = useState(null); // { name, phone }
+  const [smsMessage, setSmsMessage] = useState("");
+  const [smsSending, setSmsSending] = useState(false);
+
+  // ── Broadcast SMS ─────────────────────────────────────────────────────────────
+  const [broadcastOpen, setBroadcastOpen]     = useState(false);
+  const [broadcastScope, setBroadcastScope]   = useState("all");
+  const [broadcastMsg, setBroadcastMsg]       = useState("");
+  const [broadcastSending, setBroadcastSending] = useState(false);
+
+  // ── Fetch ────────────────────────────────────────────────────────────────────
 
   const loadUsers = useCallback(async (query) => {
     setFetching(true);
     setFetchError(null);
-    let result;
-    if (query && query.trim()) {
-      result = await searchUsers(query.trim());
-    } else {
-      result = await getAllUsers();
-    }
+    const result = await listUsers(query || "");
     setFetching(false);
     if (result.success) {
-      setUsers(result.data ?? []);
-      setTotalCount(result.count ?? (result.data?.length ?? 0));
+      setAllUsers(result.data ?? []);
+      setTotalCount(result.count ?? result.data?.length ?? 0);
     } else {
       setFetchError(result.error || "خطا در بارگذاری کاربران");
-      setUsers([]);
+      setAllUsers([]);
       setTotalCount(null);
     }
-  }, [getAllUsers, searchUsers]);
+  }, [listUsers]);
 
   useEffect(() => {
     loadUsers("");
   }, []);
 
-  // Debounce search input
+  // Debounce search + reset to page 1 on new query
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       setActiveQuery(searchInput);
+      setPage(1);
       loadUsers(searchInput);
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(debounceRef.current);
   }, [searchInput]);
+
+  // ── Pagination derivations ────────────────────────────────────────────────────
+  const totalItems  = allUsers.length;
+  const totalPages  = Math.max(1, Math.ceil(totalItems / limit));
+  const currentPage = Math.min(page, totalPages);
+  const startIdx    = (currentPage - 1) * limit;
+  const endIdx      = Math.min(startIdx + limit, totalItems);
+  const pagedUsers  = allUsers.slice(startIdx, endIdx);
 
   // ── Modal open / close ────────────────────────────────────────────────────────
 
@@ -498,10 +517,54 @@ export default function UsersPage() {
       setEditMode(false);
       setFormDraft(null);
       setEditBaseline(null);
-      // Refresh the list too
       loadUsers(activeQuery);
     } else {
       showSnackbar(result.error || "خطا در ذخیره‌سازی", "error");
+    }
+  };
+
+  // ── SMS handlers ──────────────────────────────────────────────────────────────
+
+  const openSms = (user, e) => {
+    e.stopPropagation();
+    setSmsTarget({ name: user.name || user.national_code, phone: user.phone });
+    setSmsMessage("");
+  };
+
+  const closeSms = () => {
+    setSmsTarget(null);
+    setSmsMessage("");
+  };
+
+  const handleSendSms = async () => {
+    if (!smsTarget?.phone || !smsMessage.trim()) return;
+    setSmsSending(true);
+    const result = await sendSmsToPhone(smsTarget.phone, smsMessage.trim());
+    setSmsSending(false);
+    if (result.success) {
+      showSnackbar(result.message || "پیامک با موفقیت ارسال شد.", "success");
+      closeSms();
+    } else {
+      showSnackbar(result.error || "خطا در ارسال پیامک", "error");
+    }
+  };
+
+  const handleBroadcast = async () => {
+    if (!broadcastMsg.trim()) return;
+    setBroadcastSending(true);
+    const result = await sendSmsToUsers(broadcastMsg.trim(), broadcastScope);
+    setBroadcastSending(false);
+    if (result.success) {
+      const d = result.data;
+      showSnackbar(
+        `ارسال انبوه پایان یافت — ارسال‌شده: ${d.sent ?? "?"} | ناموفق: ${d.failed ?? "?"}`,
+        "success"
+      );
+      setBroadcastOpen(false);
+      setBroadcastMsg("");
+      setBroadcastScope("all");
+    } else {
+      showSnackbar(result.error || "خطا در ارسال انبوه پیامک", "error");
     }
   };
 
@@ -515,6 +578,12 @@ export default function UsersPage() {
           <h1>مدیریت کاربران</h1>
           <p>مشاهده و جستجوی کاربران ثبت‌نام کرده در سیستم</p>
         </div>
+        {isSuperAdmin && (
+          <button className="up-broadcast-btn" onClick={() => setBroadcastOpen(true)}>
+            <i className="bi bi-broadcast" />
+            ارسال انبوه پیامک
+          </button>
+        )}
       </div>
 
       {/* Stat cards */}
@@ -522,7 +591,9 @@ export default function UsersPage() {
         <div className="up-stat-card">
           <div className="up-stat-left">
             <span className="op-stat-dot green" />
-            <span className="up-stat-label">کل کاربران</span>
+            <span className="up-stat-label">
+              {activeQuery ? "نتایج جستجو" : "کل کاربران"}
+            </span>
           </div>
           {fetching && totalCount === null ? (
             <ShimmerBlock w="50px" h="2.2rem" radius="6px" />
@@ -532,17 +603,6 @@ export default function UsersPage() {
             </span>
           )}
         </div>
-        {activeQuery && !fetching && (
-          <div className="up-stat-card">
-            <div className="up-stat-left">
-              <span className="op-stat-dot blue" />
-              <span className="up-stat-label">نتایج جستجو</span>
-            </div>
-            <span className="up-stat-value">
-              {users.length.toLocaleString("fa-IR")}
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Search toolbar */}
@@ -565,17 +625,19 @@ export default function UsersPage() {
             </button>
           )}
         </div>
-        {!fetching && !fetchError && activeQuery && (
+        {!fetching && !fetchError && (
           <span className="up-toolbar-hint">
-            {users.length === 0
+            {totalItems === 0
               ? "نتیجه‌ای یافت نشد"
-              : `${users.length.toLocaleString("fa-IR")} نتیجه برای «${activeQuery}»`}
+              : totalPages > 1
+              ? `نمایش ${(startIdx + 1).toLocaleString("fa-IR")}–${endIdx.toLocaleString("fa-IR")} از ${totalItems.toLocaleString("fa-IR")} کاربر`
+              : `${totalItems.toLocaleString("fa-IR")} کاربر`}
           </span>
         )}
       </div>
 
       {/* Table */}
-      <div className="up-table">
+      <div className={`up-table${isSuperAdmin ? " up-table--actions" : ""}`}>
         <div className="up-thead">
           <div>#</div>
           <div>کاربر</div>
@@ -583,6 +645,7 @@ export default function UsersPage() {
           <div>محل سکونت</div>
           <div>نوع مالکیت</div>
           <div>تاریخ ثبت</div>
+          {isSuperAdmin && <div />}
         </div>
 
         {fetching ? (
@@ -600,13 +663,13 @@ export default function UsersPage() {
               تلاش مجدد
             </button>
           </div>
-        ) : users.length === 0 ? (
+        ) : pagedUsers.length === 0 ? (
           <div className="up-state-msg">
             <i className="bi bi-inbox" />
             {activeQuery ? "هیچ کاربری با این مشخصات یافت نشد" : "هیچ کاربری وجود ندارد"}
           </div>
         ) : (
-          users.map((user, index) => {
+          pagedUsers.map((user, index) => {
             const profileUrl = buildProfileUrl(user.profile_image);
             const location = [user.province, user.city].filter(Boolean).join("، ") || null;
             return (
@@ -615,7 +678,7 @@ export default function UsersPage() {
                 className="up-row up-row-clickable"
                 onClick={() => openModal(user)}
               >
-                <div className="up-col-num">{index + 1}</div>
+                <div className="up-col-num">{startIdx + index + 1}</div>
 
                 <div className="up-col-user">
                   <div className="up-avatar">
@@ -658,11 +721,60 @@ export default function UsersPage() {
                 <div className="up-col-date">
                   {user.createdAt ? fmtDate(user.createdAt) : "—"}
                 </div>
+
+                {isSuperAdmin && (
+                  <div className="up-col-sms" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="up-sms-btn"
+                      title="ارسال پیامک"
+                      onClick={(e) => openSms(user, e)}
+                    >
+                      <i className="bi bi-chat-dots" />
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })
         )}
       </div>
+
+      {/* Pagination */}
+      {!fetching && !fetchError && totalItems > 0 && (
+        <div className="up-pagination">
+          <div className="up-page-size">
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              <option value={10}>۱۰</option>
+              <option value={20}>۲۰</option>
+              <option value={50}>۵۰</option>
+            </select>
+            <span>تعداد در صفحه</span>
+          </div>
+          <div className="up-page-nav">
+            <button
+              disabled={currentPage <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              قبلی ›
+            </button>
+            <span className="up-page-num">
+              {currentPage.toLocaleString("fa-IR")} / {totalPages.toLocaleString("fa-IR")}
+            </span>
+            <button
+              disabled={currentPage >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              ‹ بعدی
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ─── User detail modal ─────────────────────────────────────────────── */}
       <Modal
@@ -742,6 +854,120 @@ export default function UsersPage() {
             )}
           </div>
         )}
+      </Modal>
+
+      {/* ─── Per-user SMS modal ─────────────────────────────────────────────── */}
+      <Modal
+        isOpen={!!smsTarget}
+        onClose={closeSms}
+        title={smsTarget ? `ارسال پیامک به ${smsTarget.name}` : ""}
+        className="modal-dark"
+      >
+        <div className="up-sms-form" dir="rtl">
+          <div className="up-sms-phone-row">
+            <i className="bi bi-telephone" />
+            <span dir="ltr">{smsTarget?.phone || "—"}</span>
+          </div>
+          <div className="up-sms-field">
+            <label className="up-sms-label">متن پیامک</label>
+            <textarea
+              className="up-sms-textarea"
+              rows={5}
+              placeholder="متن پیامک را وارد کنید..."
+              value={smsMessage}
+              onChange={(e) => setSmsMessage(e.target.value)}
+              maxLength={1000}
+              dir="rtl"
+            />
+            <div className="up-sms-char-count">
+              {smsMessage.length.toLocaleString("fa-IR")} / ۱۰۰۰
+            </div>
+          </div>
+          <div className="up-sms-actions">
+            <button className="up-modal-btn up-modal-btn-cancel" onClick={closeSms} disabled={smsSending}>
+              انصراف
+            </button>
+            <button
+              className="up-modal-btn up-modal-btn-save"
+              onClick={handleSendSms}
+              disabled={smsSending || !smsMessage.trim()}
+            >
+              {smsSending ? (
+                <><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" /> در حال ارسال...</>
+              ) : (
+                <><i className="bi bi-send" /> ارسال پیامک</>
+              )}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* ─── Broadcast SMS modal ────────────────────────────────────────────── */}
+      <Modal
+        isOpen={broadcastOpen}
+        onClose={() => { setBroadcastOpen(false); setBroadcastMsg(""); setBroadcastScope("all"); }}
+        title="ارسال انبوه پیامک"
+        className="modal-dark"
+      >
+        <div className="up-sms-form" dir="rtl">
+          <div className="up-sms-field">
+            <label className="up-sms-label">محدوده ارسال</label>
+            <select
+              className="up-sms-select"
+              value={broadcastScope}
+              onChange={(e) => setBroadcastScope(e.target.value)}
+            >
+              <option value="all">همه کاربران</option>
+              <option value="without_orders">کاربران بدون سفارش</option>
+              <option value="with_orders">کاربران دارای سفارش</option>
+            </select>
+          </div>
+          <div className="up-sms-field">
+            <label className="up-sms-label">متن پیامک</label>
+            <textarea
+              className="up-sms-textarea"
+              rows={6}
+              placeholder="متن پیامک را وارد کنید..."
+              value={broadcastMsg}
+              onChange={(e) => setBroadcastMsg(e.target.value)}
+              maxLength={1000}
+              dir="rtl"
+            />
+            <div className="up-sms-char-count">
+              {broadcastMsg.length.toLocaleString("fa-IR")} / ۱۰۰۰
+            </div>
+          </div>
+          <div className="up-sms-warning">
+            <i className="bi bi-exclamation-triangle" />
+            پیامک برای
+            {broadcastScope === "all"
+              ? " همه کاربران ثبت‌نام کرده "
+              : broadcastScope === "without_orders"
+              ? " کاربران بدون هیچ سفارشی "
+              : " کاربران دارای حداقل یک سفارش "}
+            ارسال خواهد شد.
+          </div>
+          <div className="up-sms-actions">
+            <button
+              className="up-modal-btn up-modal-btn-cancel"
+              onClick={() => { setBroadcastOpen(false); setBroadcastMsg(""); setBroadcastScope("all"); }}
+              disabled={broadcastSending}
+            >
+              انصراف
+            </button>
+            <button
+              className="up-modal-btn up-modal-btn-save"
+              onClick={handleBroadcast}
+              disabled={broadcastSending || !broadcastMsg.trim()}
+            >
+              {broadcastSending ? (
+                <><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" /> در حال ارسال...</>
+              ) : (
+                <><i className="bi bi-broadcast" /> ارسال به همه</>
+              )}
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

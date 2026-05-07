@@ -103,6 +103,15 @@ export default function Header({ behavior }) {
     setNavItems(updatedNavItems);
   }, [location.pathname]);
 
+  // Open orders modal when navigated here with { state: { openOrders: true } }
+  useEffect(() => {
+    if (location.state?.openOrders) {
+      setIsOrdersModalOpen(true);
+      // Clear the flag so it doesn't re-trigger on future re-renders
+      window.history.replaceState({}, "");
+    }
+  }, [location.state]);
+
   const handleScroll = useCallback(() => {
     const shouldBeActive = window.scrollY > window.innerHeight;
     if (shouldBeActive !== hasScrolledPastThreshold) {

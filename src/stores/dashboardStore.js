@@ -248,21 +248,34 @@ const useDashboardStore = create((set, get) => ({
 
   // ---------- User List (admin / superadmin) ----------
 
-  // GET /admin/users
-  getAllUsers: async () => {
+  // GET /admin/users?q=...   (q is optional; omit or empty string → all users)
+  listUsers: async (q = '') => {
     try {
-      const response = await adminApiClient.get('/admin/users');
+      const params = q && q.trim() ? { q: q.trim() } : {};
+      const response = await adminApiClient.get('/admin/users', { params });
       return { success: true, data: response.data.users, count: response.data.count };
     } catch (error) {
       return { success: false, error: error.message };
     }
   },
 
-  // GET /admin/users/search?q=...
-  searchUsers: async (q) => {
+  // ---------- SMS (superadmin only) ----------
+
+  // POST /admin/sms  { phone, message }
+  sendSmsToPhone: async (phone, message) => {
     try {
-      const response = await adminApiClient.get('/admin/users/search', { params: { q } });
-      return { success: true, data: response.data.users, count: response.data.count };
+      const response = await adminApiClient.post('/admin/sms', { phone, message });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  // POST /admin/sms/broadcast  { message, scope: 'all' | 'without_orders' }
+  sendSmsToUsers: async (message, scope) => {
+    try {
+      const response = await adminApiClient.post('/admin/sms/broadcast', { message, scope });
+      return { success: true, data: response.data };
     } catch (error) {
       return { success: false, error: error.message };
     }
