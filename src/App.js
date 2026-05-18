@@ -7,6 +7,10 @@ import DashboardLayout from "./pages/DashboardLayout";
 import AdminsPage from "./pages/AdminsPage";
 import ProductsPage from "./pages/ProductsPage";
 import UsersPage from "./pages/UsersPage";
+import ReadyToInstallPage from "./pages/ReadyToInstallPage";
+import InstalledOrdersPage from "./pages/InstalledOrdersPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import OverviewPage from "./pages/OverviewPage";
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import DashBoardPage from "./pages/dashboard";
@@ -52,11 +56,15 @@ export default function App() {
 
       {/* Admin dashboard — all protected pages share DashboardLayout */}
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<Navigate to="userorders" replace />} />
+        <Route index element={<Navigate to="overview" replace />} />
+        <Route path="overview" element={<OverviewPage />} />
         <Route path="userorders" element={<UserOrders />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="admins" element={<AdminsPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="ready-to-install" element={<ReadyToInstallPage />} />
+        <Route path="installed-orders" element={<InstalledOrdersPage />} />
+        <Route path="my-orders" element={<MyOrdersPage />} />
         {/* Legacy tractor overview kept under its own sub-path */}
         <Route path="tractors" element={<DashBoardPage />} />
       </Route>

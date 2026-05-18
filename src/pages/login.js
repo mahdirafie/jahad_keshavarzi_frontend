@@ -99,9 +99,9 @@ export default function LoginPage() {
 
       showSnackbar("ورود با موفقیت انجام شد!", "success");
 
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
-      }
+      // Server sets the httpOnly JWT cookie; we only store a non-sensitive
+      // UI flag so components can show/hide the logged-in state instantly.
+      localStorage.setItem("isLoggedIn", "1");
 
       navigate('/home');
     } catch (error) {

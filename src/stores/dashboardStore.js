@@ -11,15 +11,13 @@ const useDashboardStore = create((set, get) => ({
 
   // ---------- Auth Actions ----------
 
-  // POST /admin/login  (public — uses regular apiClient, no admin token yet)
+  // POST /admin/login
+  // The server sets httpOnly access + refresh token cookies in the response.
   login: async (national_code, password) => {
     set({ isLoading: true, error: null });
     try {
       const response = await apiClient.post('/admin/login', { national_code, password });
-      const { access_token, refresh_token, admin } = response.data;
-
-      localStorage.setItem('adminAccessToken', access_token);
-      localStorage.setItem('adminRefreshToken', refresh_token);
+      const { admin } = response.data;
 
       set({ admin, isAuthenticated: true, isLoading: false, error: null });
       return { success: true, data: response.data };
@@ -29,15 +27,13 @@ const useDashboardStore = create((set, get) => ({
     }
   },
 
-  // POST /admin/logout  (protected — uses adminApiClient)
+  // POST /admin/logout — server clears the httpOnly cookies
   logout: async () => {
     try {
       await adminApiClient.post('/admin/logout', {});
     } catch (_) {
       // Proceed with local cleanup regardless
     } finally {
-      localStorage.removeItem('adminAccessToken');
-      localStorage.removeItem('adminRefreshToken');
       set({ admin: null, isAuthenticated: false, error: null });
     }
   },
@@ -281,12 +277,22 @@ const useDashboardStore = create((set, get) => ({
     }
   },
 
+  // ---------- Dashboard Overview (all admin roles) ----------
+
+  // GET /admin/dashboard
+  getDashboard: async () => {
+    try {
+      const response = await adminApiClient.get('/admin/dashboard');
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
   // ---------- Utilities ----------
   clearError: () => set({ error: null }),
 
   reset: () => {
-    localStorage.removeItem('adminAccessToken');
-    localStorage.removeItem('adminRefreshToken');
     set({ admin: null, isAuthenticated: false, isLoading: false, error: null });
   },
 }));

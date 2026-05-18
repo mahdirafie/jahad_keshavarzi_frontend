@@ -104,6 +104,11 @@
   color: #3fb950;
 }
 
+.ap-stat-icon.cyan {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+}
+
 .ap-stat-label {
   font-size: 0.8rem;
   color: #7d8590;

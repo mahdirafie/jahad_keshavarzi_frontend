@@ -339,6 +339,11 @@
     color: #f85149;
 }
 
+.op-badge-cyan {
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+}
+
 /* ─── Row menu (3 dots) ─── */
 .op-col-actions {
     display: flex;
@@ -375,17 +380,15 @@
 }
 
 .op-row-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: auto;
-    margin-top: 0.25rem;
+    /* position/top/right are set via inline style (getBoundingClientRect)
+       so the menu always appears directly below the trigger button on every
+       screen size and layout — including the mobile card view. */
     background: #161b22;
     border: 1px solid #21262d;
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     min-width: 200px;
-    z-index: 100;
+    z-index: 9999;
     overflow: hidden;
 }
 

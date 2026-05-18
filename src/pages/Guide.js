@@ -163,7 +163,7 @@ export default function Guide() {
               خود را بردارید
             </p>
             <div className="cta-buttons">
-              {localStorage.getItem("authToken") ? (
+              {localStorage.getItem("isLoggedIn") ? (
                 <div></div>
               ) : (
                 <button

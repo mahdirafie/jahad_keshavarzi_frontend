@@ -12,7 +12,7 @@ import useCustomSnackbar from "../hooks/useSnackBar";
 const NavigationBar = ({ onCartClick, onProfileClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isLoggedIn = !!localStorage.getItem("authToken");
+  const isLoggedIn = !!localStorage.getItem("isLoggedIn");
   const { showSnackbar } = useCustomSnackbar();
 
   const isActive = (path) => location.pathname === path;

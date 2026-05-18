@@ -27,14 +27,22 @@ export default function Map({cities}) {
     const handleMouseOver = (event) => {
       if (event.target.classList.contains("city-path")) {
         const elementId = event.target.id;
-        // console.log(elementId);
         setPopupVisible({
           isVisible: true,
           message: `دستگاه های فعال: ${activeDevices[elementId]}`,
         });
         setPopupPosition({
-          x: event.pageX,
-          y: event.pageY,
+          x: event.clientX,
+          y: event.clientY,
+        });
+      }
+    };
+
+    const handleMouseMove = (event) => {
+      if (event.target.classList.contains("city-path")) {
+        setPopupPosition({
+          x: event.clientX,
+          y: event.clientY,
         });
       }
     };
@@ -47,10 +55,12 @@ export default function Map({cities}) {
 
     const container = document.querySelector(".hover-container");
     container.addEventListener("mouseover", handleMouseOver);
+    container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("mouseout", handleMouseOut);
 
     return () => {
       container.removeEventListener("mouseover", handleMouseOver);
+      container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseout", handleMouseOut);
     };
   },);
@@ -61,13 +71,18 @@ export default function Map({cities}) {
         <div
           className="popup"
           style={{
-            position: "absolute",
-            left: `${popupPosition.x}px`,
-            top: `${popupPosition.y}px`,
-            padding: "10px",
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            color: "white",
-            borderRadius: "5px",
+            position: "fixed",
+            left: `${popupPosition.x + 14}px`,
+            top: `${popupPosition.y + 14}px`,
+            padding: "6px 12px",
+            backgroundColor: "rgba(13, 17, 23, 0.92)",
+            color: "#c9d1d9",
+            borderRadius: "6px",
+            fontSize: "0.82rem",
+            border: "1px solid #30363d",
+            pointerEvents: "none",
+            zIndex: 9999,
+            whiteSpace: "nowrap",
           }}
         >
           {isPopupVisible.message}

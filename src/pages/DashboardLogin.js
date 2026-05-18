@@ -70,7 +70,7 @@ export default function DashboardLoginPage() {
 
     if (result.success) {
       showSnackbar("ورود به داشبورد با موفقیت انجام شد!", "success");
-      navigate("/dashboard/userorders");
+      navigate("/dashboard/overview");
     } else {
       showSnackbar(result.error, "error");
     }

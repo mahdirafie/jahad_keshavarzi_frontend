@@ -228,7 +228,7 @@ const HomePage = () => {
                 خودکار داده‌ها هر یک ساعت
               </p>
               <button onClick={() => {
-                if(localStorage.getItem("authToken")) {
+                if(localStorage.getItem("isLoggedIn")) {
                   navigate("/machines")
                 } else {
                   navigate("/signup")

@@ -7,6 +7,7 @@ import { FaTractor } from "react-icons/fa";
 import "./Header.css";
 
 import useCustomSnackbar from "../hooks/useSnackBar";
+import useAuthStore from "../stores/authStore";
 import { FiClock } from "react-icons/fi";
 import ConfirmModal from "../modals/ConfirmModal";
 import ProfileModal from "../modals/ProfileModal";
@@ -57,11 +58,13 @@ const LogoutIcon = () => (
 export default function Header({ behavior }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout: authLogout } = useAuthStore();
 
   // States
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  // isLoggedIn is based on a non-sensitive UI flag; the real auth is the httpOnly cookie.
   const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("authToken")
+    !!localStorage.getItem("isLoggedIn")
   );
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -85,14 +88,10 @@ export default function Header({ behavior }) {
 
   // Effects
   useEffect(() => {
-    const checkTokenInStorage = () => {
-      const token = localStorage.getItem("authToken");
-      setIsLoggedIn(!!token);
-    };
-
-    checkTokenInStorage();
-    window.addEventListener("storage", checkTokenInStorage);
-    return () => window.removeEventListener("storage", checkTokenInStorage);
+    const syncFlag = () => setIsLoggedIn(!!localStorage.getItem("isLoggedIn"));
+    syncFlag();
+    window.addEventListener("storage", syncFlag);
+    return () => window.removeEventListener("storage", syncFlag);
   }, []);
 
   useEffect(() => {
@@ -153,9 +152,8 @@ export default function Header({ behavior }) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userData");
+  const handleLogout = async () => {
+    await authLogout(); // calls POST /user/logout → server clears httpOnly cookie
     setIsLoggedIn(false);
     showSnackbar("با موفقیت خارج شدید!", "success");
   };

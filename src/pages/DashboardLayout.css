@@ -252,6 +252,47 @@
   flex: 1;
 }
 
+/* ─── Accordion nav ─── */
+.dl-accordion-trigger {
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: right;
+}
+
+.dl-accordion-chevron {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: var(--dl-text-muted);
+}
+
+.dl-accordion-chevron-up {
+  transform: rotate(180deg);
+}
+
+.dl-accordion-trigger.dl-accordion-open {
+  color: var(--dl-text-bright);
+  background: var(--dl-border);
+}
+
+.dl-accordion-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 0.15rem;
+  border-right: 2px solid var(--dl-border-2);
+  margin-right: 1.25rem;
+  padding-right: 0.25rem;
+}
+
+.dl-nav-sub {
+  padding-right: 0.75rem !important;
+  font-size: 0.87rem !important;
+}
+
 /* ─── Responsive tweaks ─── */
 @media (max-width: 480px) {
   :root {

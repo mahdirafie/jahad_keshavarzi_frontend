@@ -4,28 +4,21 @@ import BASE_URL from './baseUrl';
 const adminApiClient = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
+  withCredentials: true,           // send httpOnly cookies on every request
   headers: { 'Content-Type': 'application/json' },
 });
 
-// ── Request interceptor ───────────────────────────────────────────────────────
-// Always attach the admin access token (never the user authToken)
-adminApiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminAccessToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
 // ── Response interceptor ─────────────────────────────────────────────────────
-// On 401: attempt silent token rotation, then retry the original request once.
-// On repeated failure: clear tokens and redirect to /dashboard/login.
+// On 401: attempt silent token rotation via the refresh endpoint.
+// The browser automatically sends the httpOnly refresh-token cookie.
+// On repeated failure: redirect to /dashboard/login.
 let isRefreshing = false;
 let pendingRequests = [];
 
-const processQueue = (error, token = null) => {
-  pendingRequests.forEach(({ resolve, reject }) => {
-    if (error) reject(error);
-    else resolve(token);
-  });
+const processQueue = (error) => {
+  pendingRequests.forEach(({ resolve, reject }) =>
+    error ? reject(error) : resolve()
+  );
   pendingRequests = [];
 };
 
@@ -38,43 +31,29 @@ adminApiClient.interceptors.response.use(
     const shouldRetry = status === 401 && !originalRequest._retry;
 
     if (shouldRetry) {
-      const refreshToken = localStorage.getItem('adminRefreshToken');
-
-      if (!refreshToken) {
-        redirectToLogin();
-        return Promise.reject(normaliseError(error));
-      }
-
       if (isRefreshing) {
         // Queue this request until the ongoing refresh completes
         return new Promise((resolve, reject) => {
           pendingRequests.push({ resolve, reject });
-        }).then((newToken) => {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return adminApiClient(originalRequest);
-        });
+        }).then(() => adminApiClient(originalRequest));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post(`${BASE_URL}/admin/refresh`, {
-          refresh_token: refreshToken,
-        });
+        // The httpOnly refresh-token cookie is sent automatically.
+        // No body or manual token needed.
+        await axios.post(
+          `${BASE_URL}/admin/refresh`,
+          {},
+          { withCredentials: true }
+        );
 
-        localStorage.setItem('adminAccessToken', data.access_token);
-        localStorage.setItem('adminRefreshToken', data.refresh_token);
-
-        adminApiClient.defaults.headers.common.Authorization = `Bearer ${data.access_token}`;
-        originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
-
-        processQueue(null, data.access_token);
+        processQueue(null);
         return adminApiClient(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
-        localStorage.removeItem('adminAccessToken');
-        localStorage.removeItem('adminRefreshToken');
+        processQueue(refreshError);
         redirectToLogin();
         return Promise.reject(normaliseError(refreshError));
       } finally {

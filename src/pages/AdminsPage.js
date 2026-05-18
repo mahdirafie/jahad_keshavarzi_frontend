@@ -9,18 +9,21 @@ const ROLE_OPTIONS = [
   { value: "superadmin", label: "سوپرادمین" },
   { value: "admin", label: "ادمین" },
   { value: "employee", label: "کارمند" },
+  { value: "installer", label: "نصاب" },
 ];
 
 const ROLE_LABELS = {
   superadmin: "سوپرادمین",
   admin: "ادمین",
   employee: "کارمند",
+  installer: "نصاب",
 };
 
 const ROLE_BADGE_CLASS = {
   superadmin: "op-badge op-badge-dot op-badge-blue",
   admin: "op-badge op-badge-dot op-badge-green",
   employee: "op-badge op-badge-dot op-badge-amber",
+  installer: "op-badge op-badge-dot op-badge-cyan",
 };
 
 const EMPTY_ADD_FORM = {
@@ -155,6 +158,7 @@ export default function AdminsPage() {
   const totalSuperadmins = admins.filter((a) => a.role === "superadmin").length;
   const totalAdmins = admins.filter((a) => a.role === "admin").length;
   const totalEmployees = admins.filter((a) => a.role === "employee").length;
+  const totalInstallers = admins.filter((a) => a.role === "installer").length;
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
@@ -198,6 +202,15 @@ export default function AdminsPage() {
           <div>
             <div className="ap-stat-label">کارمندان</div>
             <div className="ap-stat-value">{totalEmployees}</div>
+          </div>
+        </div>
+        <div className="ap-stat-card">
+          <div className="ap-stat-icon cyan">
+            <i className="bi bi-tools" />
+          </div>
+          <div>
+            <div className="ap-stat-label">نصاب‌ها</div>
+            <div className="ap-stat-value">{totalInstallers}</div>
           </div>
         </div>
       </div>

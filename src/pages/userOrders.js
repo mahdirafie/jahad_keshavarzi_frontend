@@ -1539,6 +1539,7 @@ const UserOrders = () => {
   const [filterPaymentMethod, setFilterPaymentMethod] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
   const [confirmOrder, setConfirmOrder] = useState(null);
   const [statusChangeOrder, setStatusChangeOrder] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -1555,8 +1556,15 @@ const UserOrders = () => {
         setOpenMenuId(null);
       }
     };
+    const handleScrollOrResize = () => setOpenMenuId(null);
     document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -1797,14 +1805,27 @@ const UserOrders = () => {
                         className="op-row-menu-btn"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setOpenMenuId(openMenuId === order.oid ? null : order.oid);
+                          if (openMenuId === order.oid) {
+                            setOpenMenuId(null);
+                          } else {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const fromRight = window.innerWidth - rect.right;
+                            setMenuPos({
+                              top: rect.bottom + 4,
+                              right: Math.max(4, Math.min(fromRight, window.innerWidth - 212)),
+                            });
+                            setOpenMenuId(order.oid);
+                          }
                         }}
                         aria-label="منو"
                       >
                         <i className="bi bi-three-dots-vertical"></i>
                       </button>
                       {openMenuId === order.oid && (
-                        <div className="op-row-dropdown">
+                        <div
+                          className="op-row-dropdown"
+                          style={{ position: "fixed", top: menuPos.top, right: menuPos.right, left: "auto" }}
+                        >
                           <button
                             type="button"
                             onClick={() => {
