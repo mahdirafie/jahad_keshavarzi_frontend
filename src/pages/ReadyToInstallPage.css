@@ -83,6 +83,18 @@
   cursor: not-allowed;
 }
 
+@keyframes rti-spin-sm { to { transform: rotate(360deg); } }
+.rti-spin-sm {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: rti-spin-sm 0.6s linear infinite;
+}
+
 @keyframes rti-spin {
   to { transform: rotate(360deg); }
 }

@@ -1,0 +1,296 @@
+/* ── DeviceAnalyticsPage ─────────────────────────────────────────────────── */
+.dap-page {
+  padding: 1.5rem;
+  direction: rtl;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.dap-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.dap-back-btn {
+  background: none;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  color: #7d8590;
+  font-size: 1.1rem;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  margin-top: 0.1rem;
+}
+.dap-back-btn:hover { background: #21262d; color: #c9d1d9; border-color: #484f58; }
+
+.dap-header-text { flex: 1; min-width: 0; }
+
+.dap-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f0f6fc;
+  margin: 0 0 0.25rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.dap-title-icon { color: #3fb950; }
+.dap-title-serial { font-size: 0.9rem; font-weight: 600; color: #7d8590; }
+
+.dap-subtitle {
+  font-size: 0.82rem;
+  color: #7d8590;
+  margin: 0 0 0.15rem;
+}
+.dap-subtitle-sep { color: #484f58; }
+
+.dap-period {
+  font-size: 0.78rem;
+  color: #3fb950;
+  margin: 0;
+}
+
+/* ── Duration tabs ── */
+.dap-duration-tabs {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.dap-duration-tab {
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: #7d8590;
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.dap-duration-tab:hover:not(:disabled) { background: #21262d; color: #c9d1d9; border-color: #484f58; }
+.dap-duration-tab.active { background: rgba(63,185,80,0.12); color: #3fb950; border-color: rgba(63,185,80,0.4); font-weight: 700; }
+.dap-duration-tab:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Loading ── */
+.dap-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #7d8590;
+  font-size: 0.88rem;
+  padding: 2rem 0;
+}
+.dap-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #30363d;
+  border-top-color: #3fb950;
+  border-radius: 50%;
+  animation: dap-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes dap-spin { to { transform: rotate(360deg); } }
+
+/* ── Error ── */
+.dap-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(248,81,73,0.08);
+  border: 1px solid rgba(248,81,73,0.25);
+  border-radius: 8px;
+  color: #f85149;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+.dap-retry-btn {
+  margin-right: auto;
+  background: none;
+  border: 1px solid rgba(248,81,73,0.4);
+  border-radius: 6px;
+  color: #f85149;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.dap-retry-btn:hover { background: rgba(248,81,73,0.12); }
+
+/* ── Summary stat cards ── */
+.dap-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+}
+
+.dap-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.9rem;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  flex: 1;
+  min-width: 130px;
+}
+
+.dap-stat-icon { font-size: 1.3rem; flex-shrink: 0; }
+.dap-stat-body { display: flex; flex-direction: column; min-width: 0; }
+.dap-stat-value { font-size: 1rem; font-weight: 700; color: #e6edf3; }
+.dap-stat-unit { font-size: 0.72rem; color: #7d8590; }
+.dap-stat-label { font-size: 0.72rem; color: #7d8590; margin-top: 0.1rem; }
+
+/* ── Chart sections ── */
+.dap-chart-section {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  padding: 1rem 1rem 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.dap-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #c9d1d9;
+  margin: 0 0 0.85rem;
+}
+.dap-section-title .bi { color: #3fb950; font-size: 1rem; }
+
+/* ── Tooltip ── */
+.dap-tooltip {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  direction: rtl;
+}
+.dap-tooltip-label { color: #7d8590; margin-bottom: 0.25rem; font-size: 0.75rem; }
+.dap-tooltip-row { margin: 0.15rem 0; }
+
+/* ── Widgets (RPM / Signal / Temp) ── */
+.dap-widgets-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dap-widget-card {
+  flex: 1;
+  min-width: 200px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── RPM Gauge ── */
+.dap-gauge-wrap {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+}
+.dap-gauge-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* ── Cell signal widget ── */
+.dap-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding-top: 0.25rem;
+  width: 100%;
+}
+
+.dap-widget-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dap-widget-icon { font-size: 1.8rem; }
+.dap-widget-label { font-size: 0.78rem; color: #7d8590; }
+
+.dap-signal-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 44px;
+}
+
+.dap-signal-bar {
+  width: 12px;
+  border-radius: 3px 3px 0 0;
+  transition: background 0.3s;
+}
+
+.dap-widget-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ── Temp widget ── */
+.dap-temp-widget .dap-widget-value {
+  font-size: 1.6rem;
+}
+
+/* ── Map ── */
+.dap-map-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  height: 320px;
+}
+
+.dap-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Empty ── */
+.dap-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3rem 1rem;
+  color: #484f58;
+}
+.dap-empty-icon { font-size: 2.5rem; }
+.dap-empty p { font-size: 0.88rem; margin: 0; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .dap-page { padding: 0.75rem; }
+  .dap-stats-row { gap: 0.5rem; }
+  .dap-stat-card { min-width: 100px; }
+  .dap-widgets-section { flex-direction: column; }
+  .dap-duration-tab { padding: 0.3rem 0.65rem; font-size: 0.78rem; }
+  .dap-map-wrap { height: 240px; }
+}

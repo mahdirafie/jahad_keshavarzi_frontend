@@ -289,6 +289,48 @@ const useDashboardStore = create((set, get) => ({
     }
   },
 
+  // ---------- System Config (superadmin only) ----------
+
+  // GET /config/sell → { sell_open: bool }
+  getSellConfig: async () => {
+    try {
+      const r = await adminApiClient.get('/config/sell');
+      return { success: true, data: r.data };
+    } catch (e) {
+      return { success: false, error: e.response?.data?.message || e.message };
+    }
+  },
+
+  // GET /config/log-urls → { urls: [...] }
+  getLogUrlsConfig: async () => {
+    try {
+      const r = await adminApiClient.get('/config/log-urls');
+      return { success: true, data: r.data };
+    } catch (e) {
+      return { success: false, error: e.response?.data?.message || e.message };
+    }
+  },
+
+  // PUT /config/sell – body { sell_open: bool }
+  updateSellConfig: async (sellOpen) => {
+    try {
+      const r = await adminApiClient.put('/config/sell', { sell_open: sellOpen });
+      return { success: true, data: r.data };
+    } catch (e) {
+      return { success: false, error: e.response?.data?.message || e.message };
+    }
+  },
+
+  // PUT /config/log-urls – body { urls: [...] }
+  updateLogUrlsConfig: async (urls) => {
+    try {
+      const r = await adminApiClient.put('/config/log-urls', { urls });
+      return { success: true, data: r.data };
+    } catch (e) {
+      return { success: false, error: e.response?.data?.message || e.message };
+    }
+  },
+
   // ---------- Utilities ----------
   clearError: () => set({ error: null }),
 

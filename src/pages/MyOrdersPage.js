@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import useDashboardLogStore from "../stores/dashboardLogStore";
+import useCustomSnackbar from "../hooks/useSnackBar";
 import { formatDate } from "../utils/DateFormat";
 import "./MyOrdersPage.css";
 
@@ -59,9 +60,12 @@ export default function MyOrdersPage() {
     isLoadingMyOrders,
     myOrdersError,
     getOrdersForInstaller,
+    changeOrderStatus,
   } = useDashboardLogStore();
+  const { showSnackbar } = useCustomSnackbar();
   const [status, setStatus]       = useState("READY_FOR_INSTALLATION");
   const [page, setPage]           = useState(1);
+  const [confirmingId, setConfirmingId] = useState(null);
   const currentStatus = STATUSES.find((s) => s.value === status);
 
   /* ── Fetch ── */
@@ -85,6 +89,20 @@ export default function MyOrdersPage() {
   useEffect(() => {
     fetchOrders();
   }, [page]);
+
+  /* ── Confirm install ── */
+  const handleConfirmInstall = async (order) => {
+    const orderId = order.oid || order.id;
+    setConfirmingId(orderId);
+    const result = await changeOrderStatus(orderId, "INSTALLED");
+    setConfirmingId(null);
+    if (result.success) {
+      showSnackbar("سفارش به عنوان نصب شده ثبت شد", "success");
+      fetchOrders();
+    } else {
+      showSnackbar(result.error || "خطا در ثبت وضعیت", "error");
+    }
+  };
 
   /* ── Pagination ── */
   const goToPage = (p) => {
@@ -162,6 +180,7 @@ export default function MyOrdersPage() {
             const device    = order.device   || null;
             const machineLabel = getMachineLabel(order.machinery);
             const orderId   = order.oid || order.id;
+            const isConfirming = confirmingId === orderId;
             return (
               <div key={orderId} className="mop-card">
 
@@ -215,6 +234,29 @@ export default function MyOrdersPage() {
                         .filter(Boolean)
                         .join(" — ")}
                     </span>
+                  </div>
+                )}
+
+                {/* ── Confirm install button (only on READY_FOR_INSTALLATION tab) ── */}
+                {status === "READY_FOR_INSTALLATION" && (
+                  <div className="mop-card-footer">
+                    <button
+                      className="mop-toggle-btn mop-toggle-install"
+                      onClick={() => handleConfirmInstall(order)}
+                      disabled={isConfirming}
+                    >
+                      {isConfirming ? (
+                        <>
+                          <span className="mop-spin-sm" />
+                          در حال ثبت...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-check2-circle" />
+                          نصب شد
+                          </>
+                      )}
+                    </button>
                   </div>
                 )}
 

@@ -10,6 +10,9 @@ import UsersPage from "./pages/UsersPage";
 import ReadyToInstallPage from "./pages/ReadyToInstallPage";
 import InstalledOrdersPage from "./pages/InstalledOrdersPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
+import ReportsPage from "./pages/ReportsPage";
+import DeviceAnalyticsPage from "./pages/DeviceAnalyticsPage";
+import SystemConfigPage from "./pages/SystemConfigPage";
 import OverviewPage from "./pages/OverviewPage";
 
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -65,6 +68,9 @@ export default function App() {
         <Route path="ready-to-install" element={<ReadyToInstallPage />} />
         <Route path="installed-orders" element={<InstalledOrdersPage />} />
         <Route path="my-orders" element={<MyOrdersPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+        <Route path="device-analytics/:deviceId" element={<DeviceAnalyticsPage />} />
+        <Route path="system-config" element={<SystemConfigPage />} />
         {/* Legacy tractor overview kept under its own sub-path */}
         <Route path="tractors" element={<DashBoardPage />} />
       </Route>

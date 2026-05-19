@@ -99,16 +99,21 @@ const useDashboardLogStore = create((set) => ({
     }
   },
 
-  // PATCH endpoints TBD — replace with vpLogApiClient when backend ships
-  revertInstalledToReadyForInstallation: async (_orderId) => ({
-    success: false,
-    error: 'این عملیات هنوز در سرور فعال نشده است.',
-  }),
-
-  finalizeInstalledOrder: async (_orderId) => ({
-    success: false,
-    error: 'این عملیات هنوز در سرور فعال نشده است.',
-  }),
+  // PATCH /api/device/orders/:orderId/status  { status }
+  // Allowed statuses: READY_FOR_INSTALLATION | INSTALLED | COMPLETED
+  // Allowed actors: superadmin, installer (backend enforces ownership)
+  changeOrderStatus: async (orderId, status) => {
+    try {
+      const response = await vpLogApiClient.patch(
+        `/api/device/orders/${orderId}/status`,
+        { status },
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      const msg = error.response?.data?.message || error.message;
+      return { success: false, error: msg };
+    }
+  },
 
   // POST /api/device/devices
   // dto: { serial_number, machinery_id, sim_operator, sim_phone_number, sim_serial_number }
@@ -194,6 +199,34 @@ const useDashboardLogStore = create((set) => ({
       const response = await vpLogApiClient.patch(
         `/api/device/orders/${orderId}/toggle-status`,
       );
+      return { success: true, data: response.data };
+    } catch (error) {
+      const msg = error.response?.data?.message || error.message;
+      return { success: false, error: msg };
+    }
+  },
+
+  // ── Device analytics (superadmin / admin) ───────────────────────────────
+  // GET /api/device/logs/analytics?device_id=<id>&duration=<day|week|month|year|ytd>
+  getDeviceAnalytics: async (deviceId, duration = 'week') => {
+    try {
+      const response = await vpLogApiClient.get('/api/device/logs/analytics', {
+        params: { device_id: deviceId, duration },
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      const msg = error.response?.data?.message || error.message;
+      return { success: false, error: msg };
+    }
+  },
+
+  // ── User device search (superadmin / admin) ─────────────────────────────
+  // GET /api/device/logs/search?q=<term>&page=<n>&limit=<n>
+  searchUserDevices: async ({ q, page = 1, limit = 20 } = {}) => {
+    try {
+      const params = { page, limit };
+      if (q) params.q = q;
+      const response = await vpLogApiClient.get('/api/device/logs/search', { params });
       return { success: true, data: response.data };
     } catch (error) {
       const msg = error.response?.data?.message || error.message;

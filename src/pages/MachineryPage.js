@@ -11,6 +11,7 @@ import "./MachineryPage.css";
 import { formatPriceWithCurrency } from "../utils/PriceFormat";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import apiClient from "../common/apiClient";
 
 // ---------- Persian translations for enums ----------
 const tractorTypeLabels = {
@@ -263,6 +264,18 @@ const MachineryPage = () => {
       return;
     }
 
+    // Check if selling is currently open before proceeding
+    try {
+      const { data } = await apiClient.get("/config/sell");
+      if (!data?.sell_open) {
+        showSnackbar("ثبت سفارش موقتا بسته شده است. لطفاً بعداً تلاش کنید.", "error");
+        return;
+      }
+    } catch {
+      showSnackbar("خطا در بررسی وضعیت فروش. لطفاً دوباره تلاش کنید.", "error");
+      return;
+    }
+
     setIsOrdering(true);
 
     try {
@@ -330,7 +343,7 @@ const MachineryPage = () => {
 
       // Step 3: Redirect to Zarinpal payment page
       const gatewayBaseUrl = 
-       process.env.REACT_APP_TYPE === "debuging"
+       process.env.REACT_APP_TYPE === "debugging"
          ? "https://sandbox.zarinpal.com/pg/StartPay/"
          : "https://payment.zarinpal.com/pg/StartPay/";
       window.location.href = `${gatewayBaseUrl}${authority}`;
@@ -476,15 +489,15 @@ const MachineryPage = () => {
               <div className="installment-message">
                 <p>توجه: به منظور نهایی سازی مراحل ثبت سفارش خواهشمند است دو فقره چک صیادی به شرح ذیل ثبت و به شرکت یا اتاق اصناف  کشاورزی محل اقامت خود ارائه نمایید:</p>
                 <p>
-                  چک اول:‌ تاریخ: یک ماه بعد از واریز مبلغ اولیه.    به مبلغ: ۳ میلیون تومان
+                  چک اول:‌ تاریخ: یک ماه بعد از واریز مبلغ اولیه. &nbsp; به مبلغ: {product ? formatPriceWithCurrency(product.price / 4) : "—"}
                 </p>
                 <p>
-                  چک دوم:‌ تاریخ: یک ماه بعد از تاریخ سررسید چک اول.    به مبلغ: ۳ میلیون تومان
+                  چک دوم:‌ تاریخ: یک ماه بعد از تاریخ سررسید چک اول. &nbsp; به مبلغ: {product ? formatPriceWithCurrency(product.price / 4) : "—"}
                 </p>
                 <p>
                   در وجه شرکت تکاپو گشترش ویدا به شماره شناسه ملی: 14009399112
                 </p>
-                <p>'
+                <p>
                   از حسن اعتماد شما سپاسگزاریم.
                 </p>
               </div>
@@ -607,45 +620,6 @@ const MachineryPage = () => {
               {selectedMachineType === "chopper" && "افزودن چاپر"}
             </h3>
 
-            <div className="machinery-form-group">
-              <label className="machinery-form-label">مدل *</label>
-              <input
-                type="text"
-                name="model"
-                value={formData.model}
-                onChange={handleInputChange}
-                className={`machinery-form-input ${
-                  formErrors.model ? "error" : ""
-                }`}
-                placeholder="مثال: John Deere S780"
-              />
-              {formErrors.model && (
-                <span className="machinery-error-message">
-                  {formErrors.model}
-                </span>
-              )}
-            </div>
-
-            <div className="machinery-form-group">
-              <label className="machinery-form-label">سال تولید *</label>
-              <input
-                type="text"
-                name="manufacture_year"
-                value={formData.manufacture_year}
-                onChange={handleInputChange}
-                className={`machinery-form-input ${
-                  formErrors.manufacture_year ? "error" : ""
-                }`}
-                placeholder="مثال: 1400"
-                maxLength="4"
-              />
-              {formErrors.manufacture_year && (
-                <span className="machinery-error-message">
-                  {formErrors.manufacture_year}
-                </span>
-              )}
-            </div>
-
             {selectedMachineType === "tractor" && (
               <div className="machinery-form-group">
                 <label className="machinery-form-label">نوع تراکتور *</label>
@@ -723,6 +697,45 @@ const MachineryPage = () => {
                 )}
               </div>
             )}
+
+            <div className="machinery-form-group">
+              <label className="machinery-form-label">مدل *</label>
+              <input
+                type="text"
+                name="model"
+                value={formData.model}
+                onChange={handleInputChange}
+                className={`machinery-form-input ${
+                  formErrors.model ? "error" : ""
+                }`}
+                placeholder="مثال: John Deere S780"
+              />
+              {formErrors.model && (
+                <span className="machinery-error-message">
+                  {formErrors.model}
+                </span>
+              )}
+            </div>
+
+            <div className="machinery-form-group">
+              <label className="machinery-form-label">سال تولید *</label>
+              <input
+                type="text"
+                name="manufacture_year"
+                value={formData.manufacture_year}
+                onChange={handleInputChange}
+                className={`machinery-form-input ${
+                  formErrors.manufacture_year ? "error" : ""
+                }`}
+                placeholder="مثال: 1400"
+                maxLength="4"
+              />
+              {formErrors.manufacture_year && (
+                <span className="machinery-error-message">
+                  {formErrors.manufacture_year}
+                </span>
+              )}
+            </div>
 
             <div className="machinery-modal-actions">
               <button

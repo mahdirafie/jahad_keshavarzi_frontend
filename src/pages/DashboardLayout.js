@@ -23,9 +23,15 @@ const LOG_SUB_ITEMS = [
     path: "/dashboard/my-orders",
     roles: ["installer"],
   },
+  {
+    label: "گزارشات",
+    icon: "bi-search",
+    path: "/dashboard/reports",
+    roles: ["superadmin", "admin"],
+  },
 ];
 
-const LOG_SECTION_ROLES = ["superadmin", "installer"];
+const LOG_SECTION_ROLES = ["superadmin", "admin", "installer"];
 
 const ROLE_LABELS = {
   superadmin: "سوپرادمین",
@@ -73,6 +79,7 @@ export default function DashboardLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loadingRole, setLoadingRole] = useState(true);
   const [logAccordionOpen, setLogAccordionOpen] = useState(false);
+  const [sysAccordionOpen, setSysAccordionOpen] = useState(false);
   const sidebarRef = useRef(null);
 
   useEffect(() => {
@@ -217,6 +224,41 @@ export default function DashboardLayout() {
                 </NavLink>
               ))}
             </div>
+          )}
+
+          {/* ── System config accordion (superadmin only) ── */}
+          {admin?.role === "superadmin" && (
+            <>
+              <button
+                className={`dl-nav-item dl-accordion-trigger${
+                  sysAccordionOpen ? " dl-accordion-open" : ""
+                }`}
+                onClick={() => setSysAccordionOpen((v) => !v)}
+              >
+                <i className="bi bi-gear-wide-connected" />
+                <span style={{ flex: 1, textAlign: "right" }}>تنظیمات سیستم</span>
+                <i
+                  className={`bi bi-chevron-down dl-accordion-chevron${
+                    sysAccordionOpen ? " dl-accordion-chevron-up" : ""
+                  }`}
+                />
+              </button>
+
+              {sysAccordionOpen && (
+                <div className="dl-accordion-body">
+                  <NavLink
+                    to="/dashboard/system-config"
+                    className={({ isActive }) =>
+                      `dl-nav-item dl-nav-sub${isActive ? " dl-nav-active" : ""}`
+                    }
+                    onClick={closeDrawer}
+                  >
+                    <i className="bi bi-sliders" />
+                    <span>پیکربندی عمومی</span>
+                  </NavLink>
+                </div>
+              )}
+            </>
           )}
         </nav>
 

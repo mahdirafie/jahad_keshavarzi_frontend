@@ -54,8 +54,7 @@ export default function InstalledOrdersPage() {
     installedError,
     getInstalledOrders,
     getInstallers,
-    revertInstalledToReadyForInstallation,
-    finalizeInstalledOrder,
+    changeOrderStatus,
   } = useDashboardLogStore();
   const { admin } = useDashboardStore();
   const navigate = useNavigate();
@@ -72,6 +71,8 @@ export default function InstalledOrdersPage() {
   const [page, setPage] = useState(1);
   const LIMIT = 5;
   const debounceRef = useRef(null);
+
+  const [actioningId, setActioningId] = useState(null); // orderId currently being actioned
 
   const [filterInstaller, setFilterInstaller] = useState(null);
   const [filterListOpen, setFilterListOpen] = useState(false);
@@ -157,23 +158,27 @@ export default function InstalledOrdersPage() {
 
   const handleRevertToReady = async (order) => {
     const orderId = order.oid || order.id;
-    const result = await revertInstalledToReadyForInstallation(orderId);
+    setActioningId(orderId);
+    const result = await changeOrderStatus(orderId, "READY_FOR_INSTALLATION");
+    setActioningId(null);
     if (result.success) {
       showSnackbar("سفارش به وضعیت آماده نصب برگردانده شد", "success");
       fetchOrders();
     } else {
-      showSnackbar(result.error || "خطا در تغییر وضعیت", "info");
+      showSnackbar(result.error || "خطا در تغییر وضعیت", "error");
     }
   };
 
   const handleFinalize = async (order) => {
     const orderId = order.oid || order.id;
-    const result = await finalizeInstalledOrder(orderId);
+    setActioningId(orderId);
+    const result = await changeOrderStatus(orderId, "COMPLETED");
+    setActioningId(null);
     if (result.success) {
-      showSnackbar("سفارش نهایی شد", "success");
+      showSnackbar("سفارش با موفقیت نهایی شد", "success");
       fetchOrders();
     } else {
-      showSnackbar(result.error || "خطا در نهایی‌سازی", "info");
+      showSnackbar(result.error || "خطا در نهایی‌سازی", "error");
     }
   };
 
@@ -322,6 +327,7 @@ export default function InstalledOrdersPage() {
             const machineLabel = getMachineLabel(order.machinery);
             const orderId = order.oid || order.id;
             const machineryId = order.machinery?.id ?? order.machinery_id;
+            const isActioning = actioningId === orderId;
 
             return (
               <div key={orderId} className="rti-card">
@@ -390,16 +396,26 @@ export default function InstalledOrdersPage() {
                     type="button"
                     className="rti-action-btn rti-action-revert"
                     onClick={() => handleRevertToReady(order)}
+                    disabled={isActioning}
                   >
-                    <i className="bi bi-arrow-counterclockwise" />
+                    {isActioning ? (
+                      <span className="rti-spin-sm" />
+                    ) : (
+                      <i className="bi bi-arrow-counterclockwise" />
+                    )}
                     برگشت به آماده نصب
                   </button>
                   <button
                     type="button"
                     className="rti-action-btn rti-action-finalize"
                     onClick={() => handleFinalize(order)}
+                    disabled={isActioning}
                   >
-                    <i className="bi bi-flag-fill" />
+                    {isActioning ? (
+                      <span className="rti-spin-sm" />
+                    ) : (
+                      <i className="bi bi-flag-fill" />
+                    )}
                     نهایی سازی سفارش
                   </button>
                 </div>
